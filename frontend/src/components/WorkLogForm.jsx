@@ -4,8 +4,17 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8000/api';
 
 function WorkLogForm({ employeeId, onSuccess, onCancel }) {
+  // Get local date in YYYY-MM-DD format
+  const getLocalDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: getLocalDate(),
     hours: '',
     log_type: 'work',
     notes: ''
