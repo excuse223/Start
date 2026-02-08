@@ -105,7 +105,7 @@ function EmployeeDetails() {
   return (
     <div>
       <div className="employee-header">
-        <h1>{employee.name}</h1>
+        <h1>{employee.first_name} {employee.last_name}</h1>
         <div className="btn-group">
           <button 
             className="btn btn-primary" 
@@ -126,37 +126,32 @@ function EmployeeDetails() {
         {editMode ? (
           <form onSubmit={handleEditSubmit}>
             <div className="form-group">
-              <label>Name</label>
+              <label>First Name *</label>
               <input
                 type="text"
-                value={editData.name}
-                onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                value={editData.first_name || ''}
+                onChange={(e) => setEditData({ ...editData, first_name: e.target.value })}
                 required
+                placeholder="Enter first name"
               />
             </div>
             <div className="form-group">
-              <label>Email</label>
+              <label>Last Name *</label>
+              <input
+                type="text"
+                value={editData.last_name || ''}
+                onChange={(e) => setEditData({ ...editData, last_name: e.target.value })}
+                required
+                placeholder="Enter last name"
+              />
+            </div>
+            <div className="form-group">
+              <label>Email (Optional)</label>
               <input
                 type="email"
-                value={editData.email}
+                value={editData.email || ''}
                 onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Position</label>
-              <input
-                type="text"
-                value={editData.position || ''}
-                onChange={(e) => setEditData({ ...editData, position: e.target.value })}
-              />
-            </div>
-            <div className="form-group">
-              <label>Department</label>
-              <input
-                type="text"
-                value={editData.department || ''}
-                onChange={(e) => setEditData({ ...editData, department: e.target.value })}
+                placeholder="Enter email address (optional)"
               />
             </div>
             <div className="btn-group">
@@ -175,16 +170,16 @@ function EmployeeDetails() {
         ) : (
           <div className="employee-info">
             <div className="info-item">
+              <label>First Name</label>
+              <div className="value">{employee.first_name}</div>
+            </div>
+            <div className="info-item">
+              <label>Last Name</label>
+              <div className="value">{employee.last_name}</div>
+            </div>
+            <div className="info-item">
               <label>Email</label>
-              <div className="value">{employee.email}</div>
-            </div>
-            <div className="info-item">
-              <label>Position</label>
-              <div className="value">{employee.position || '-'}</div>
-            </div>
-            <div className="info-item">
-              <label>Department</label>
-              <div className="value">{employee.department || '-'}</div>
+              <div className="value">{employee.email || 'Not provided'}</div>
             </div>
             <div className="info-item">
               <label>Total Hours Logged</label>

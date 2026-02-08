@@ -10,10 +10,9 @@ function EmployeeList() {
   const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    position: '',
-    department: ''
+    first_name: '',
+    last_name: '',
+    email: ''
   });
 
   useEffect(() => {
@@ -47,7 +46,7 @@ function EmployeeList() {
     try {
       await axios.post(`${API_URL}/employees/`, formData);
       setShowAddForm(false);
-      setFormData({ name: '', email: '', position: '', department: '' });
+      setFormData({ first_name: '', last_name: '', email: '' });
       fetchEmployees();
     } catch (err) {
       alert('Failed to add employee. Please try again.');
@@ -95,41 +94,35 @@ function EmployeeList() {
           <h2>Add New Employee</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Name *</label>
+              <label>First Name *</label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="first_name"
+                value={formData.first_name}
                 onChange={handleInputChange}
                 required
+                placeholder="Enter first name"
               />
             </div>
             <div className="form-group">
-              <label>Email *</label>
+              <label>Last Name *</label>
+              <input
+                type="text"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleInputChange}
+                required
+                placeholder="Enter last name"
+              />
+            </div>
+            <div className="form-group">
+              <label>Email (Optional)</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Position</label>
-              <input
-                type="text"
-                name="position"
-                value={formData.position}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="form-group">
-              <label>Department</label>
-              <input
-                type="text"
-                name="department"
-                value={formData.department}
-                onChange={handleInputChange}
+                placeholder="Enter email address (optional)"
               />
             </div>
             <div className="btn-group">
@@ -153,27 +146,25 @@ function EmployeeList() {
           <table>
             <thead>
               <tr>
-                <th>Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
                 <th>Email</th>
-                <th>Position</th>
-                <th>Department</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {employees.length === 0 ? (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
+                  <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>
                     No employees found. Add your first employee to get started.
                   </td>
                 </tr>
               ) : (
                 employees.map(employee => (
                   <tr key={employee.id}>
-                    <td>{employee.name}</td>
-                    <td>{employee.email}</td>
-                    <td>{employee.position || '-'}</td>
-                    <td>{employee.department || '-'}</td>
+                    <td>{employee.first_name}</td>
+                    <td>{employee.last_name}</td>
+                    <td>{employee.email || '-'}</td>
                     <td>
                       <div className="btn-group">
                         <Link 
