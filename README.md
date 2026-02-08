@@ -2,6 +2,8 @@
 
 A complete web application for managing and tracking employee work hours, built with FastAPI (backend), React.js (frontend), and PostgreSQL database, all containerized with Docker.
 
+> 📚 **[Pełny przewodnik z komendami / Full command guide →](QUICK_START.md)**
+
 ## 🚀 Features
 
 - **Employee Management**: Add, edit, view, and delete employee records
@@ -55,6 +57,9 @@ A complete web application for managing and tracking employee work hours, built 
 - Docker Compose 2.0+
 
 ## 🚀 Quick Start
+
+> 📖 **Więcej komend i szczegółów → [QUICK_START.md](QUICK_START.md)**  
+> 📖 **More commands and details → [QUICK_START.md](QUICK_START.md)**
 
 ### 1. Clone the Repository
 
