@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import WorkLogForm from './WorkLogForm';
 
 const API_URL = 'http://localhost:8000/api';
 
 function EmployeeDetails() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [employee, setEmployee] = useState(null);
@@ -28,7 +30,7 @@ function EmployeeDetails() {
       setWorkLogs(logsRes.data);
       setEditData(employeeRes.data);
     } catch (err) {
-      setError('Failed to load employee data. Please try again.');
+      setError(t('employees.loadError'));
       console.error('Error fetching employee data:', err);
     } finally {
       setLoading(false);
@@ -47,20 +49,20 @@ function EmployeeDetails() {
       setEmployee(editData);
       setEditMode(false);
     } catch (err) {
-      alert('Failed to update employee. Please try again.');
+      alert(t('employees.updateError'));
       console.error('Error updating employee:', err);
     }
   };
 
   const handleDeleteLog = async (logId) => {
-    if (!window.confirm('Are you sure you want to delete this work log?')) {
+    if (!window.confirm(t('workLogs.deleteConfirm'))) {
       return;
     }
     try {
       await axios.delete(`${API_URL}/work-logs/${logId}/`);
       fetchEmployeeData();
     } catch (err) {
-      alert('Failed to delete work log. Please try again.');
+      alert(t('workLogs.deleteError'));
       console.error('Error deleting work log:', err);
     }
   };
@@ -92,14 +94,14 @@ function EmployeeDetails() {
       <div>
         <div className="alert alert-error">{error}</div>
         <button className="btn btn-secondary" onClick={() => navigate('/employees')}>
-          Back to Employees
+          {t('employees.backToList')}
         </button>
       </div>
     );
   }
 
   if (!employee) {
-    return <div className="alert alert-error">Employee not found</div>;
+    return <div className="alert alert-error">{t('employees.loadError')}</div>;
   }
 
   return (
@@ -111,13 +113,13 @@ function EmployeeDetails() {
             className="btn btn-primary" 
             onClick={() => setEditMode(!editMode)}
           >
-            {editMode ? 'Cancel Edit' : 'Edit Employee'}
+            {editMode ? t('employees.cancelEdit') : t('employees.editEmployee')}
           </button>
           <button 
             className="btn btn-secondary" 
             onClick={() => navigate('/employees')}
           >
-            Back to List
+            {t('employees.backToList')}
           </button>
         </div>
       </div>
@@ -126,63 +128,63 @@ function EmployeeDetails() {
         {editMode ? (
           <form onSubmit={handleEditSubmit}>
             <div className="form-group">
-              <label>First Name *</label>
+              <label>{t('employees.firstName')} *</label>
               <input
                 type="text"
                 value={editData.first_name || ''}
                 onChange={(e) => setEditData({ ...editData, first_name: e.target.value })}
                 required
-                placeholder="Enter first name"
+                placeholder={t('employees.firstName')}
               />
             </div>
             <div className="form-group">
-              <label>Last Name *</label>
+              <label>{t('employees.lastName')} *</label>
               <input
                 type="text"
                 value={editData.last_name || ''}
                 onChange={(e) => setEditData({ ...editData, last_name: e.target.value })}
                 required
-                placeholder="Enter last name"
+                placeholder={t('employees.lastName')}
               />
             </div>
             <div className="form-group">
-              <label>Email (Optional)</label>
+              <label>{t('employees.emailOptional')}</label>
               <input
                 type="email"
                 value={editData.email || ''}
                 onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                placeholder="Enter email address (optional)"
+                placeholder={t('employees.emailOptional')}
               />
             </div>
             <div className="btn-group">
               <button type="submit" className="btn btn-success">
-                Save Changes
+                {t('employees.saveChanges')}
               </button>
               <button 
                 type="button" 
                 className="btn btn-secondary" 
                 onClick={() => setEditMode(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </form>
         ) : (
           <div className="employee-info">
             <div className="info-item">
-              <label>First Name</label>
+              <label>{t('employees.firstName')}</label>
               <div className="value">{employee.first_name}</div>
             </div>
             <div className="info-item">
-              <label>Last Name</label>
+              <label>{t('employees.lastName')}</label>
               <div className="value">{employee.last_name}</div>
             </div>
             <div className="info-item">
-              <label>Email</label>
-              <div className="value">{employee.email || 'Not provided'}</div>
+              <label>{t('employees.email')}</label>
+              <div className="value">{employee.email || t('employees.notProvided')}</div>
             </div>
             <div className="info-item">
-              <label>Total Hours Logged</label>
+              <label>{t('employees.totalHoursLogged')}</label>
               <div className="value">{calculateTotalHours()}h</div>
             </div>
           </div>
@@ -191,12 +193,12 @@ function EmployeeDetails() {
 
       <div className="work-logs">
         <div className="employee-header">
-          <h2>Work Logs</h2>
+          <h2>{t('workLogs.title')}</h2>
           <button 
             className="btn btn-primary" 
             onClick={() => setShowAddLog(!showAddLog)}
           >
-            {showAddLog ? 'Cancel' : '+ Add Work Log'}
+            {showAddLog ? t('common.cancel') : '+ ' + t('workLogs.addWorkLog')}
           </button>
         </div>
 
@@ -216,7 +218,7 @@ function EmployeeDetails() {
         <div className="card">
           {workLogs.length === 0 ? (
             <p style={{ textAlign: 'center', padding: '2rem', color: '#7f8c8d' }}>
-              No work logs found. Add the first work log to get started.
+              {t('workLogs.noLogs')}
             </p>
           ) : (
             workLogs.map(log => (
@@ -239,7 +241,7 @@ function EmployeeDetails() {
                       style={{ marginLeft: '1rem' }}
                       onClick={() => handleDeleteLog(log.id)}
                     >
-                      Delete
+                      {t('common.delete')}
                     </button>
                   </div>
                 </div>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api';
 
 function EmployeeList() {
+  const { t } = useTranslation();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +28,7 @@ function EmployeeList() {
       const response = await axios.get(`${API_URL}/employees/`);
       setEmployees(response.data);
     } catch (err) {
-      setError('Failed to load employees. Please try again.');
+      setError(t('employees.loadError'));
       console.error('Error fetching employees:', err);
     } finally {
       setLoading(false);
@@ -49,20 +51,20 @@ function EmployeeList() {
       setFormData({ first_name: '', last_name: '', email: '' });
       fetchEmployees();
     } catch (err) {
-      alert('Failed to add employee. Please try again.');
+      alert(t('employees.addError'));
       console.error('Error adding employee:', err);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this employee?')) {
+    if (!window.confirm(t('employees.deleteConfirm'))) {
       return;
     }
     try {
       await axios.delete(`${API_URL}/employees/${id}/`);
       fetchEmployees();
     } catch (err) {
-      alert('Failed to delete employee. Please try again.');
+      alert(t('employees.deleteError'));
       console.error('Error deleting employee:', err);
     }
   };
@@ -78,12 +80,12 @@ function EmployeeList() {
   return (
     <div>
       <div className="employee-header">
-        <h1>Employees</h1>
+        <h1>{t('employees.title')}</h1>
         <button 
           className="btn btn-primary" 
           onClick={() => setShowAddForm(!showAddForm)}
         >
-          {showAddForm ? 'Cancel' : '+ Add Employee'}
+          {showAddForm ? t('common.cancel') : '+ ' + t('employees.addEmployee')}
         </button>
       </div>
 
@@ -91,50 +93,50 @@ function EmployeeList() {
 
       {showAddForm && (
         <div className="card">
-          <h2>Add New Employee</h2>
+          <h2>{t('employees.addEmployee')}</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>First Name *</label>
+              <label>{t('employees.firstName')} *</label>
               <input
                 type="text"
                 name="first_name"
                 value={formData.first_name}
                 onChange={handleInputChange}
                 required
-                placeholder="Enter first name"
+                placeholder={t('employees.firstName')}
               />
             </div>
             <div className="form-group">
-              <label>Last Name *</label>
+              <label>{t('employees.lastName')} *</label>
               <input
                 type="text"
                 name="last_name"
                 value={formData.last_name}
                 onChange={handleInputChange}
                 required
-                placeholder="Enter last name"
+                placeholder={t('employees.lastName')}
               />
             </div>
             <div className="form-group">
-              <label>Email (Optional)</label>
+              <label>{t('employees.emailOptional')}</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Enter email address (optional)"
+                placeholder={t('employees.emailOptional')}
               />
             </div>
             <div className="btn-group">
               <button type="submit" className="btn btn-success">
-                Add Employee
+                {t('employees.addEmployee')}
               </button>
               <button 
                 type="button" 
                 className="btn btn-secondary" 
                 onClick={() => setShowAddForm(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </form>
@@ -146,17 +148,17 @@ function EmployeeList() {
           <table>
             <thead>
               <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Actions</th>
+                <th>{t('employees.firstName')}</th>
+                <th>{t('employees.lastName')}</th>
+                <th>{t('employees.email')}</th>
+                <th>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {employees.length === 0 ? (
                 <tr>
                   <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>
-                    No employees found. Add your first employee to get started.
+                    {t('employees.noEmployees')}
                   </td>
                 </tr>
               ) : (
@@ -171,13 +173,13 @@ function EmployeeList() {
                           to={`/employees/${employee.id}`} 
                           className="btn btn-primary"
                         >
-                          View
+                          {t('employees.view')}
                         </Link>
                         <button 
                           className="btn btn-danger" 
                           onClick={() => handleDelete(employee.id)}
                         >
-                          Delete
+                          {t('common.delete')}
                         </button>
                       </div>
                     </td>
