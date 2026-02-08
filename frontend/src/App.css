@@ -50,10 +50,41 @@ body {
 
 .sidebar h1 {
   padding: 0 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   font-size: 1.5rem;
   border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 1rem;
+}
+
+.language-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.language-switcher button {
+  flex: 1;
+  padding: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.language-switcher button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.language-switcher button.active {
+  background-color: #3498db;
+  border-color: #3498db;
+  font-weight: bold;
 }
 
 .sidebar nav {
