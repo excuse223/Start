@@ -54,9 +54,6 @@ frontend/.env
 *.sqlite3
 postgres_data/
 
-# Docker
-.dockerignore
-
 # OS
 .DS_Store
 Thumbs.db
