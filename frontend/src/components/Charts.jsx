@@ -50,7 +50,7 @@ function Charts({ summaryData }) {
         const empLogs = logs.filter(log => log.employee === emp.id);
         const totalHours = empLogs.reduce((sum, log) => sum + parseFloat(log.hours), 0);
         return {
-          name: emp.name,
+          name: `${emp.first_name} ${emp.last_name}`,
           hours: totalHours
         };
       });
@@ -154,7 +154,7 @@ function Charts({ summaryData }) {
       },
       title: {
         display: true,
-        text: t('charts.monthlyOverview'),
+        text: t('charts.hoursByEmployee'),
         font: {
           size: 16,
           weight: 'bold'

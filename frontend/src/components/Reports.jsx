@@ -134,7 +134,7 @@ function Reports() {
       const employee = employees.find(e => e.id === log.employee);
       return [
         log.date,
-        employee ? employee.name : 'Unknown',
+        employee ? `${employee.first_name} ${employee.last_name}` : 'Unknown',
         log.log_type,
         log.hours,
         log.notes || ''
@@ -160,7 +160,7 @@ function Reports() {
 
   const getEmployeeName = (employeeId) => {
     const employee = employees.find(e => e.id === employeeId);
-    return employee ? employee.name : 'Unknown';
+    return employee ? `${employee.first_name} ${employee.last_name}` : 'Unknown';
   };
 
   if (loading) {
@@ -190,7 +190,7 @@ function Reports() {
               <option value="">{t('common.allEmployees')}</option>
               {employees.map(emp => (
                 <option key={emp.id} value={emp.id}>
-                  {emp.name}
+                  {emp.first_name} {emp.last_name}
                 </option>
               ))}
             </select>

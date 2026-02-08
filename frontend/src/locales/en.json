@@ -114,6 +114,7 @@
     "title": "Charts",
     "hoursDistribution": "Hours Distribution",
     "monthlyOverview": "Monthly Overview",
+    "hoursByEmployee": "Total Hours by Employee",
     "workHours": "Work Hours",
     "overtime": "Overtime",
     "vacation": "Vacation",

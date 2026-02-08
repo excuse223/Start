@@ -114,6 +114,7 @@
     "title": "Wykresy",
     "hoursDistribution": "Rozkład Godzin",
     "monthlyOverview": "Przegląd Miesięczny",
+    "hoursByEmployee": "Suma Godzin według Pracownika",
     "workHours": "Godziny Pracy",
     "overtime": "Nadgodziny",
     "vacation": "Urlop",
