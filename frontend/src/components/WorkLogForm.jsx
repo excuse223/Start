@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = 'http://localhost:8000/api';
 
 function WorkLogForm({ employeeId, onSuccess, onCancel }) {
+  const { t } = useTranslation();
+  
   // Get local date in YYYY-MM-DD format
   const getLocalDate = () => {
     const today = new Date();
@@ -46,12 +49,12 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
     // Validation
     const hours = parseFloat(formData.hours);
     if (isNaN(hours) || hours <= 0) {
-      alert('Please enter valid hours greater than 0');
+      alert(t('workLogs.addError'));
       return;
     }
 
     if (hours > 24) {
-      alert('Hours cannot exceed 24 per day');
+      alert(t('workLogs.addError'));
       return;
     }
 
@@ -65,7 +68,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
       await axios.post(`${API_URL}/work-logs/`, payload);
       onSuccess();
     } catch (err) {
-      let errorMessage = 'Failed to add work log. Please try again.';
+      let errorMessage = t('workLogs.addError');
       
       if (err.response && err.response.data) {
         const errors = err.response.data;
@@ -87,16 +90,16 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Add Work Log</h3>
+      <h3>{t('workLogs.addWorkLog')}</h3>
       
       {showWarning && (
         <div className="alert alert-warning">
-          ⚠️ Warning: You are logging more than 12 hours for this day. Please verify this is correct.
+          ⚠️ {t('workLogs.warning12Hours', { hours: formData.hours })}
         </div>
       )}
 
       <div className="form-group">
-        <label>Date *</label>
+        <label>{t('workLogs.date')} *</label>
         <input
           type="date"
           name="date"
@@ -107,7 +110,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
       </div>
 
       <div className="form-group">
-        <label>Hours *</label>
+        <label>{t('workLogs.workHours')} *</label>
         <input
           type="number"
           name="hours"
@@ -121,32 +124,32 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
         />
         <small className="form-error">
           {formData.hours && parseFloat(formData.hours) > 12 && 
-            'Hours exceed 12. Please verify.'}
+            t('workLogs.warning12Hours', { hours: formData.hours })}
         </small>
       </div>
 
       <div className="form-group">
-        <label>Type *</label>
+        <label>{t('workLogs.workHours')} *</label>
         <select
           name="log_type"
           value={formData.log_type}
           onChange={handleInputChange}
           required
         >
-          <option value="work">Work</option>
-          <option value="overtime">Overtime</option>
-          <option value="vacation">Vacation</option>
-          <option value="sick">Sick Leave</option>
+          <option value="work">{t('charts.workHours')}</option>
+          <option value="overtime">{t('charts.overtime')}</option>
+          <option value="vacation">{t('charts.vacation')}</option>
+          <option value="sick">{t('charts.sickLeave')}</option>
         </select>
       </div>
 
       <div className="form-group">
-        <label>Notes</label>
+        <label>{t('workLogs.notes')}</label>
         <textarea
           name="notes"
           value={formData.notes}
           onChange={handleInputChange}
-          placeholder="Add any additional notes..."
+          placeholder={t('workLogs.notes')}
         />
       </div>
 
@@ -156,7 +159,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
           className="btn btn-success"
           disabled={submitting}
         >
-          {submitting ? 'Adding...' : 'Add Work Log'}
+          {submitting ? t('common.loading') : t('workLogs.addWorkLog')}
         </button>
         <button 
           type="button" 
@@ -164,7 +167,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
           onClick={onCancel}
           disabled={submitting}
         >
-          Cancel
+          {t('common.cancel')}
         </button>
       </div>
     </form>

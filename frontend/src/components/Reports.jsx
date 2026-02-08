@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = 'http://localhost:8000/api';
 
 function Reports() {
+  const { t } = useTranslation();
   const [employees, setEmployees] = useState([]);
   const [workLogs, setWorkLogs] = useState([]);
   const [filters, setFilters] = useState({
@@ -38,7 +40,7 @@ function Reports() {
       setEmployees(employeesRes.data);
       setWorkLogs(logsRes.data);
     } catch (err) {
-      setError('Failed to load report data. Please try again.');
+      setError(t('reports.generateError'));
       console.error('Error fetching report data:', err);
     } finally {
       setLoading(false);
@@ -122,12 +124,12 @@ function Reports() {
 
   const handleExport = () => {
     if (filteredLogs.length === 0) {
-      alert('No data to export');
+      alert(t('reports.noData'));
       return;
     }
 
     // Create CSV content
-    const headers = ['Date', 'Employee', 'Type', 'Hours', 'Notes'];
+    const headers = [t('workLogs.date'), t('employees.title'), t('workLogs.workHours'), t('workLogs.workHours'), t('workLogs.notes')];
     const rows = filteredLogs.map(log => {
       const employee = employees.find(e => e.id === log.employee);
       return [
@@ -171,21 +173,21 @@ function Reports() {
 
   return (
     <div>
-      <h1>Reports</h1>
+      <h1>{t('reports.title')}</h1>
 
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="card">
-        <h2>Filters</h2>
+        <h2>{t('common.filter')}</h2>
         <div className="report-filters">
           <div className="form-group">
-            <label>Employee</label>
+            <label>{t('employees.title')}</label>
             <select
               name="employee"
               value={filters.employee}
               onChange={handleFilterChange}
             >
-              <option value="">All Employees</option>
+              <option value="">{t('reports.selectEmployee')}</option>
               {employees.map(emp => (
                 <option key={emp.id} value={emp.id}>
                   {emp.name}
@@ -195,7 +197,7 @@ function Reports() {
           </div>
 
           <div className="form-group">
-            <label>Start Date</label>
+            <label>{t('reports.startDate')}</label>
             <input
               type="date"
               name="startDate"
@@ -205,7 +207,7 @@ function Reports() {
           </div>
 
           <div className="form-group">
-            <label>End Date</label>
+            <label>{t('reports.endDate')}</label>
             <input
               type="date"
               name="endDate"
@@ -215,61 +217,61 @@ function Reports() {
           </div>
 
           <div className="form-group">
-            <label>Type</label>
+            <label>{t('workLogs.workHours')}</label>
             <select
               name="logType"
               value={filters.logType}
               onChange={handleFilterChange}
             >
-              <option value="">All Types</option>
-              <option value="work">Work</option>
-              <option value="overtime">Overtime</option>
-              <option value="vacation">Vacation</option>
-              <option value="sick">Sick Leave</option>
+              <option value="">{t('reports.selectEmployee')}</option>
+              <option value="work">{t('charts.workHours')}</option>
+              <option value="overtime">{t('charts.overtime')}</option>
+              <option value="vacation">{t('charts.vacation')}</option>
+              <option value="sick">{t('charts.sickLeave')}</option>
             </select>
           </div>
         </div>
 
         <div className="report-actions">
           <button className="btn btn-secondary" onClick={handleReset}>
-            Reset Filters
+            {t('common.back')}
           </button>
           <button 
             className="btn btn-success" 
             onClick={handleExport}
             disabled={filteredLogs.length === 0}
           >
-            📥 Export to CSV
+            📥 {t('reports.download')}
           </button>
         </div>
       </div>
 
       {reportStats && (
         <div className="card">
-          <h2>Summary</h2>
+          <h2>{t('dashboard.statistics')}</h2>
           <div className="summary-cards">
             <div className="summary-card">
-              <h3>Total Logs</h3>
+              <h3>{t('workLogs.title')}</h3>
               <div className="value">{reportStats.totalLogs}</div>
             </div>
             <div className="summary-card work">
-              <h3>Work Hours</h3>
+              <h3>{t('charts.workHours')}</h3>
               <div className="value">{reportStats.workHours.toFixed(1)}h</div>
             </div>
             <div className="summary-card overtime">
-              <h3>Overtime</h3>
+              <h3>{t('charts.overtime')}</h3>
               <div className="value">{reportStats.overtimeHours.toFixed(1)}h</div>
             </div>
             <div className="summary-card vacation">
-              <h3>Vacation</h3>
+              <h3>{t('charts.vacation')}</h3>
               <div className="value">{reportStats.vacationHours.toFixed(1)}h</div>
             </div>
             <div className="summary-card sick">
-              <h3>Sick Leave</h3>
+              <h3>{t('charts.sickLeave')}</h3>
               <div className="value">{reportStats.sickHours.toFixed(1)}h</div>
             </div>
             <div className="summary-card">
-              <h3>Total Hours</h3>
+              <h3>{t('workLogs.totalHours')}</h3>
               <div className="value">{reportStats.totalHours.toFixed(1)}h</div>
             </div>
           </div>
@@ -277,21 +279,21 @@ function Reports() {
       )}
 
       <div className="card">
-        <h2>Work Logs ({filteredLogs.length})</h2>
+        <h2>{t('workLogs.title')} ({filteredLogs.length})</h2>
         {filteredLogs.length === 0 ? (
           <p style={{ textAlign: 'center', padding: '2rem', color: '#7f8c8d' }}>
-            No work logs found matching the selected filters.
+            {t('workLogs.noLogs')}
           </p>
         ) : (
           <div className="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Employee</th>
-                  <th>Type</th>
-                  <th>Hours</th>
-                  <th>Notes</th>
+                  <th>{t('workLogs.date')}</th>
+                  <th>{t('employees.title')}</th>
+                  <th>{t('workLogs.workHours')}</th>
+                  <th>{t('workLogs.workHours')}</th>
+                  <th>{t('workLogs.notes')}</th>
                 </tr>
               </thead>
               <tbody>

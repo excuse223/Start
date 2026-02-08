@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import Charts from './Charts';
 
 const API_URL = 'http://localhost:8000/api';
 
 function Dashboard() {
+  const { t } = useTranslation();
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +22,7 @@ function Dashboard() {
       const response = await axios.get(`${API_URL}/work-logs/summary/`);
       setSummary(response.data);
     } catch (err) {
-      setError('Failed to load dashboard data. Please try again.');
+      setError(t('common.error'));
       console.error('Error fetching summary:', err);
     } finally {
       setLoading(false);
@@ -38,10 +40,10 @@ function Dashboard() {
   if (error) {
     return (
       <div className="dashboard">
-        <h1>Dashboard</h1>
+        <h1>{t('dashboard.title')}</h1>
         <div className="alert alert-error">{error}</div>
         <button className="btn btn-primary" onClick={fetchSummary}>
-          Retry
+          {t('common.back')}
         </button>
       </div>
     );
@@ -49,23 +51,23 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-      <h1>Dashboard</h1>
+      <h1>{t('dashboard.title')}</h1>
       
       <div className="summary-cards">
         <div className="summary-card work">
-          <h3>Total Work Hours</h3>
+          <h3>{t('dashboard.workHours')}</h3>
           <div className="value">{summary?.total_work_hours?.toFixed(1) || 0}h</div>
         </div>
         <div className="summary-card overtime">
-          <h3>Total Overtime</h3>
+          <h3>{t('dashboard.overtime')}</h3>
           <div className="value">{summary?.total_overtime_hours?.toFixed(1) || 0}h</div>
         </div>
         <div className="summary-card vacation">
-          <h3>Total Vacation</h3>
+          <h3>{t('dashboard.vacation')}</h3>
           <div className="value">{summary?.total_vacation_hours?.toFixed(1) || 0}h</div>
         </div>
         <div className="summary-card sick">
-          <h3>Total Sick Leave</h3>
+          <h3>{t('dashboard.sickLeave')}</h3>
           <div className="value">{summary?.total_sick_hours?.toFixed(1) || 0}h</div>
         </div>
       </div>

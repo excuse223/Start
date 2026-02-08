@@ -11,6 +11,7 @@ import {
 } from 'chart.js';
 import { Pie, Bar } from 'react-chartjs-2';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 ChartJS.register(
   ArcElement,
@@ -25,6 +26,7 @@ ChartJS.register(
 const API_URL = 'http://localhost:8000/api';
 
 function Charts({ summaryData }) {
+  const { t } = useTranslation();
   const [employeeData, setEmployeeData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -63,10 +65,10 @@ function Charts({ summaryData }) {
 
   // Pie chart data for hours by type
   const pieData = {
-    labels: ['Work', 'Overtime', 'Vacation', 'Sick Leave'],
+    labels: [t('charts.workHours'), t('charts.overtime'), t('charts.vacation'), t('charts.sickLeave')],
     datasets: [
       {
-        label: 'Hours',
+        label: t('workLogs.workHours'),
         data: [
           summaryData?.total_work_hours || 0,
           summaryData?.total_overtime_hours || 0,
@@ -95,7 +97,7 @@ function Charts({ summaryData }) {
     labels: employeeData.map(emp => emp.name),
     datasets: [
       {
-        label: 'Total Hours',
+        label: t('workLogs.totalHours'),
         data: employeeData.map(emp => emp.hours),
         backgroundColor: 'rgba(52, 152, 219, 0.8)',
         borderColor: 'rgba(52, 152, 219, 1)',
@@ -119,7 +121,7 @@ function Charts({ summaryData }) {
       },
       title: {
         display: true,
-        text: 'Hours Distribution by Type',
+        text: t('charts.hoursDistribution'),
         font: {
           size: 16,
           weight: 'bold'
@@ -152,7 +154,7 @@ function Charts({ summaryData }) {
       },
       title: {
         display: true,
-        text: 'Total Hours by Employee',
+        text: t('charts.monthlyOverview'),
         font: {
           size: 16,
           weight: 'bold'
@@ -165,7 +167,7 @@ function Charts({ summaryData }) {
       tooltip: {
         callbacks: {
           label: function(context) {
-            return `Hours: ${context.parsed.y.toFixed(1)}h`;
+            return `${t('workLogs.workHours')}: ${context.parsed.y.toFixed(1)}h`;
           }
         }
       }
@@ -201,7 +203,7 @@ function Charts({ summaryData }) {
     return (
       <div className="card">
         <p style={{ textAlign: 'center', padding: '2rem', color: '#7f8c8d' }}>
-          No data available for charts. Add work logs to see visualizations.
+          {t('dashboard.noData')}
         </p>
       </div>
     );
