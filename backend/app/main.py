@@ -6,7 +6,7 @@ from app.database import engine, Base
 app = FastAPI(
     title="Work Hours Management System",
     description="Work hours management and billing system",
-    version="1.0.0"
+    version="1.0.1"
 )
 
 # CORS configuration
