@@ -5,6 +5,8 @@ A complete web application for managing and tracking employee work hours, built 
 ## 🚀 Features
 
 - **Employee Management**: Add, edit, view, and delete employee records
+  - Email field is optional for employees
+  - Track first name and last name separately
 - **Work Log Tracking**: Record daily work hours with multiple categories:
   - Regular work hours
   - Overtime hours
@@ -17,6 +19,10 @@ A complete web application for managing and tracking employee work hours, built 
   - Owner reports (with full financial data and costs)
   - Export to PDF
 - **Interactive Dashboard**: Visual overview with charts and statistics
+- **Multi-Language Support**: 🇵🇱 Polish and 🇬🇧 English interface
+  - Default language: Polish
+  - Easy language switching via sidebar buttons
+  - Language preference saved automatically
 - **Role-Based Access**: Separate views for managers and owners
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
 
@@ -35,6 +41,8 @@ A complete web application for managing and tracking employee work hours, built 
 - **React Router** - Client-side routing
 - **Chart.js** - Data visualization
 - **Axios** - HTTP client
+- **i18next** - Internationalization framework
+- **react-i18next** - React bindings for i18next
 
 ### Infrastructure
 - **Docker** - Containerization
@@ -178,8 +186,13 @@ docker-compose exec -T postgres psql -U admin work_hours_db < backup.sql
 
 1. Navigate to the "Employees" page
 2. Click "Add New Employee"
-3. Fill in the employee details (first name, last name, email)
+3. Fill in the employee details:
+   - **First Name** (required)
+   - **Last Name** (required)
+   - **Email** (optional - can be left empty)
 4. Click "Save"
+
+**Note**: Email address is optional and can be left empty for employees who don't have one.
 
 ### Recording Work Hours
 
@@ -197,6 +210,28 @@ docker-compose exec -T postgres psql -U admin work_hours_db < backup.sql
 7. Click "Save"
 
 **Note**: If total hours exceed 12, you'll see a warning but can still save.
+
+### Changing Language / Zmiana Języka
+
+The application supports Polish and English languages:
+
+1. Look for the language switcher in the sidebar (top section)
+2. Click 🇵🇱 **PL** for Polish (Polski)
+3. Click 🇬🇧 **EN** for English
+4. Your language preference is automatically saved
+
+**Default Language**: Polish (Polski)
+
+---
+
+Aplikacja obsługuje języki polski i angielski:
+
+1. Znajdź przełącznik języka na pasku bocznym (górna sekcja)
+2. Kliknij 🇵🇱 **PL** dla języka polskiego
+3. Kliknij 🇬🇧 **EN** dla języka angielskiego
+4. Twój wybór języka jest automatycznie zapisywany
+
+**Domyślny język**: Polski
 
 ### Generating Reports
 
