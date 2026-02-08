@@ -5,14 +5,16 @@ from app.database import engine, Base
 
 app = FastAPI(
     title="Work Hours Management System",
-    description="Sistema de gestión y facturación de horas de trabajo",
+    description="Work hours management and billing system",
     version="1.0.0"
 )
 
 # CORS configuration
+# NOTE: In production, replace allow_origins=["*"] with specific domains
+# Example: allow_origins=["https://yourdomain.com", "https://app.yourdomain.com"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=["*"],  # TODO: Restrict in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

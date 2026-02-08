@@ -154,7 +154,7 @@ def update_work_log(work_log_id: int, work_log: WorkLogUpdate, db: Session = Dep
     for key, value in work_log.model_dump().items():
         setattr(db_work_log, key, value)
     
-    db_work_log.updated_at = datetime.utcnow()
+    # The updated_at field is automatically updated by SQLAlchemy onupdate
     db.commit()
     db.refresh(db_work_log)
     

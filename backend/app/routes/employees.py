@@ -61,7 +61,7 @@ def update_employee(employee_id: int, employee: EmployeeUpdate, db: Session = De
     for key, value in employee.model_dump().items():
         setattr(db_employee, key, value)
     
-    db_employee.updated_at = datetime.utcnow()
+    # The updated_at field is automatically updated by SQLAlchemy onupdate
     db.commit()
     db.refresh(db_employee)
     return db_employee

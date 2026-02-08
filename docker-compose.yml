@@ -1,3 +1,15 @@
+# Work Hours Management System - Docker Compose Configuration
+# 
+# IMPORTANT SECURITY NOTES FOR PRODUCTION:
+# 1. Change all default passwords (POSTGRES_PASSWORD)
+# 2. Use Docker secrets or environment files for sensitive data
+# 3. Restrict CORS origins in backend/app/main.py
+# 4. Use HTTPS with proper SSL certificates
+# 5. Set strong SECRET_KEY in backend .env file
+# 6. Consider using a reverse proxy (nginx/traefik) for SSL termination
+#
+# For local development, the default credentials are acceptable.
+
 services:
   postgres:
     image: postgres:15
