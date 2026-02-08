@@ -87,7 +87,9 @@
     "addError": "Nie udało się dodać wpisu. Spróbuj ponownie.",
     "updateError": "Nie udało się zaktualizować wpisu. Spróbuj ponownie.",
     "deleteError": "Nie udało się usunąć wpisu. Spróbuj ponownie.",
-    "loadError": "Nie udało się wczytać wpisów. Spróbuj ponownie."
+    "loadError": "Nie udało się wczytać wpisów. Spróbuj ponownie.",
+    "invalidHours": "Proszę wprowadzić prawidłową liczbę godzin większą niż 0",
+    "hoursExceed24": "Liczba godzin nie może przekroczyć 24 na dzień"
   },
   "reports": {
     "title": "Raporty",
@@ -105,7 +107,8 @@
     "download": "Pobierz",
     "noData": "Brak danych dla wybranego okresu",
     "generateError": "Nie udało się wygenerować raportu. Spróbuj ponownie.",
-    "exportToCsv": "Eksportuj do CSV"
+    "exportToCsv": "Eksportuj do CSV",
+    "totalLogs": "Suma Wpisów"
   },
   "charts": {
     "title": "Wykresy",

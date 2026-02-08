@@ -87,7 +87,9 @@
     "addError": "Failed to add work log. Please try again.",
     "updateError": "Failed to update work log. Please try again.",
     "deleteError": "Failed to delete work log. Please try again.",
-    "loadError": "Failed to load work logs. Please try again."
+    "loadError": "Failed to load work logs. Please try again.",
+    "invalidHours": "Please enter valid hours greater than 0",
+    "hoursExceed24": "Hours cannot exceed 24 per day"
   },
   "reports": {
     "title": "Reports",
@@ -105,7 +107,8 @@
     "download": "Download",
     "noData": "No data available for the selected period",
     "generateError": "Failed to generate report. Please try again.",
-    "exportToCsv": "Export to CSV"
+    "exportToCsv": "Export to CSV",
+    "totalLogs": "Total Logs"
   },
   "charts": {
     "title": "Charts",

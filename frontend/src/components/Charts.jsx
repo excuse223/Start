@@ -68,7 +68,7 @@ function Charts({ summaryData }) {
     labels: [t('charts.workHours'), t('charts.overtime'), t('charts.vacation'), t('charts.sickLeave')],
     datasets: [
       {
-        label: t('workLogs.workHours'),
+        label: t('common.hours'),
         data: [
           summaryData?.total_work_hours || 0,
           summaryData?.total_overtime_hours || 0,
@@ -167,7 +167,7 @@ function Charts({ summaryData }) {
       tooltip: {
         callbacks: {
           label: function(context) {
-            return `${t('workLogs.workHours')}: ${context.parsed.y.toFixed(1)}h`;
+            return `${t('common.hours')}: ${context.parsed.y.toFixed(1)}h`;
           }
         }
       }

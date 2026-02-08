@@ -49,12 +49,12 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
     // Validation
     const hours = parseFloat(formData.hours);
     if (isNaN(hours) || hours <= 0) {
-      alert(t('workLogs.addError'));
+      alert(t('workLogs.invalidHours'));
       return;
     }
 
     if (hours > 24) {
-      alert(t('workLogs.addError'));
+      alert(t('workLogs.hoursExceed24'));
       return;
     }
 

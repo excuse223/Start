@@ -251,7 +251,7 @@ function Reports() {
           <h2>{t('dashboard.statistics')}</h2>
           <div className="summary-cards">
             <div className="summary-card">
-              <h3>{t('workLogs.title')}</h3>
+              <h3>{t('reports.totalLogs')}</h3>
               <div className="value">{reportStats.totalLogs}</div>
             </div>
             <div className="summary-card work">
