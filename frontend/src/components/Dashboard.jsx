@@ -43,7 +43,7 @@ function Dashboard() {
         <h1>{t('dashboard.title')}</h1>
         <div className="alert alert-error">{error}</div>
         <button className="btn btn-primary" onClick={fetchSummary}>
-          {t('common.back')}
+          {t('common.retry')}
         </button>
       </div>
     );

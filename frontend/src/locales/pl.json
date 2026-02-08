@@ -14,7 +14,13 @@
     "filter": "Filtruj",
     "actions": "Akcje",
     "optional": "Opcjonalne",
-    "required": "Wymagane"
+    "required": "Wymagane",
+    "retry": "Spróbuj ponownie",
+    "reset": "Resetuj Filtry",
+    "allTypes": "Wszystkie Typy",
+    "allEmployees": "Wszyscy Pracownicy",
+    "type": "Typ",
+    "hours": "Godziny"
   },
   "navigation": {
     "dashboard": "Pulpit",
@@ -98,7 +104,8 @@
     "overtimeMultiplier": "Mnożnik Nadgodzin",
     "download": "Pobierz",
     "noData": "Brak danych dla wybranego okresu",
-    "generateError": "Nie udało się wygenerować raportu. Spróbuj ponownie."
+    "generateError": "Nie udało się wygenerować raportu. Spróbuj ponownie.",
+    "exportToCsv": "Eksportuj do CSV"
   },
   "charts": {
     "title": "Wykresy",

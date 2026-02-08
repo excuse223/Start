@@ -14,7 +14,13 @@
     "filter": "Filter",
     "actions": "Actions",
     "optional": "Optional",
-    "required": "Required"
+    "required": "Required",
+    "retry": "Retry",
+    "reset": "Reset Filters",
+    "allTypes": "All Types",
+    "allEmployees": "All Employees",
+    "type": "Type",
+    "hours": "Hours"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -98,7 +104,8 @@
     "overtimeMultiplier": "Overtime Multiplier",
     "download": "Download",
     "noData": "No data available for the selected period",
-    "generateError": "Failed to generate report. Please try again."
+    "generateError": "Failed to generate report. Please try again.",
+    "exportToCsv": "Export to CSV"
   },
   "charts": {
     "title": "Charts",

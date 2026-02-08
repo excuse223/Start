@@ -129,7 +129,7 @@ function Reports() {
     }
 
     // Create CSV content
-    const headers = [t('workLogs.date'), t('employees.title'), t('workLogs.workHours'), t('workLogs.workHours'), t('workLogs.notes')];
+    const headers = [t('workLogs.date'), t('employees.title'), t('common.type'), t('common.hours'), t('workLogs.notes')];
     const rows = filteredLogs.map(log => {
       const employee = employees.find(e => e.id === log.employee);
       return [
@@ -187,7 +187,7 @@ function Reports() {
               value={filters.employee}
               onChange={handleFilterChange}
             >
-              <option value="">{t('reports.selectEmployee')}</option>
+              <option value="">{t('common.allEmployees')}</option>
               {employees.map(emp => (
                 <option key={emp.id} value={emp.id}>
                   {emp.name}
@@ -217,13 +217,13 @@ function Reports() {
           </div>
 
           <div className="form-group">
-            <label>{t('workLogs.workHours')}</label>
+            <label>{t('common.type')}</label>
             <select
               name="logType"
               value={filters.logType}
               onChange={handleFilterChange}
             >
-              <option value="">{t('reports.selectEmployee')}</option>
+              <option value="">{t('common.allTypes')}</option>
               <option value="work">{t('charts.workHours')}</option>
               <option value="overtime">{t('charts.overtime')}</option>
               <option value="vacation">{t('charts.vacation')}</option>
@@ -234,14 +234,14 @@ function Reports() {
 
         <div className="report-actions">
           <button className="btn btn-secondary" onClick={handleReset}>
-            {t('common.back')}
+            {t('common.reset')}
           </button>
           <button 
             className="btn btn-success" 
             onClick={handleExport}
             disabled={filteredLogs.length === 0}
           >
-            📥 {t('reports.download')}
+            📥 {t('reports.exportToCsv')}
           </button>
         </div>
       </div>
@@ -291,8 +291,8 @@ function Reports() {
                 <tr>
                   <th>{t('workLogs.date')}</th>
                   <th>{t('employees.title')}</th>
-                  <th>{t('workLogs.workHours')}</th>
-                  <th>{t('workLogs.workHours')}</th>
+                  <th>{t('common.type')}</th>
+                  <th>{t('common.hours')}</th>
                   <th>{t('workLogs.notes')}</th>
                 </tr>
               </thead>

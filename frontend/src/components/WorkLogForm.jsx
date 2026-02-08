@@ -110,7 +110,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
       </div>
 
       <div className="form-group">
-        <label>{t('workLogs.workHours')} *</label>
+        <label>{t('common.hours')} *</label>
         <input
           type="number"
           name="hours"
@@ -129,7 +129,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
       </div>
 
       <div className="form-group">
-        <label>{t('workLogs.workHours')} *</label>
+        <label>{t('common.type')} *</label>
         <select
           name="log_type"
           value={formData.log_type}
