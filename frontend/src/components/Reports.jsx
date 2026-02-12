@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-
-const API_URL = 'http://localhost:8000/api';
+import API_URL from '../config';
 
 function Reports() {
   const { t } = useTranslation();

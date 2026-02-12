@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8000/api';
+import API_URL from '../config';
 
 function EmployeeList() {
   const { t } = useTranslation();

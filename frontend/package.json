@@ -1,6 +1,7 @@
 {
   "name": "work-hours-frontend",
   "version": "1.0.0",
+  "proxy": "http://backend:8000",
   "private": true,
   "dependencies": {
     "react": "^18.2.0",
