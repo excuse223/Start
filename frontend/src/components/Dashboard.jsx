@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import Charts from './Charts';
-
-const API_URL = 'http://localhost:8000/api';
+import API_URL from '../config';
 
 function Dashboard() {
   const { t } = useTranslation();
