@@ -28,7 +28,7 @@ class EmployeeResponse(EmployeeBase):
     class Config:
         from_attributes = True
 
-@router.get("/", response_model=List[EmployeeResponse])
+@router.get("", response_model=List[EmployeeResponse])
 def get_employees(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get all employees"""
     employees = db.query(Employee).offset(skip).limit(limit).all()
@@ -42,7 +42,7 @@ def get_employee(employee_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Employee not found")
     return employee
 
-@router.post("/", response_model=EmployeeResponse, status_code=201)
+@router.post("", response_model=EmployeeResponse, status_code=201)
 def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
     """Create a new employee"""
     db_employee = Employee(**employee.model_dump())
