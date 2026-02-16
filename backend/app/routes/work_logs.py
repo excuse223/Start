@@ -77,6 +77,44 @@ def get_work_logs(
     work_logs = query.offset(skip).limit(limit).all()
     return work_logs
 
+@router.get("/summary")
+def get_work_logs_summary(db: Session = Depends(get_db)):
+    """Get summary of all work logs"""
+    work_logs = db.query(WorkLog).all()
+    
+    if not work_logs:
+        return {
+            "total_work_hours": 0,
+            "total_overtime_hours": 0,
+            "total_vacation_hours": 0,
+            "total_sick_leave_hours": 0,
+            "total_other_hours": 0,
+            "total_logs": 0
+        }
+    
+    total_work = 0
+    total_overtime = 0
+    total_vacation = 0
+    total_sick = 0
+    total_other = 0
+    
+    # Convert Decimal to float for JSON serialization
+    for log in work_logs:
+        total_work += float(log.work_hours)
+        total_overtime += float(log.overtime_hours)
+        total_vacation += float(log.vacation_hours)
+        total_sick += float(log.sick_leave_hours)
+        total_other += float(log.other_hours)
+    
+    return {
+        "total_work_hours": total_work,
+        "total_overtime_hours": total_overtime,
+        "total_vacation_hours": total_vacation,
+        "total_sick_leave_hours": total_sick,
+        "total_other_hours": total_other,
+        "total_logs": len(work_logs)
+    }
+
 @router.get("/{work_log_id}", response_model=WorkLogResponse)
 def get_work_log(work_log_id: int, db: Session = Depends(get_db)):
     """Get work log by ID"""

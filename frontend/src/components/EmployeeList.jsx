@@ -24,7 +24,7 @@ function EmployeeList() {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${API_URL}/employees/`);
+      const response = await axios.get(`${API_URL}/employees`);
       setEmployees(response.data);
     } catch (err) {
       setError(t('employees.loadError'));
@@ -45,7 +45,7 @@ function EmployeeList() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/employees/`, formData);
+      await axios.post(`${API_URL}/employees`, formData);
       setShowAddForm(false);
       setFormData({ first_name: '', last_name: '', email: '' });
       fetchEmployees();
@@ -60,7 +60,7 @@ function EmployeeList() {
       return;
     }
     try {
-      await axios.delete(`${API_URL}/employees/${id}/`);
+      await axios.delete(`${API_URL}/employees/${id}`);
       fetchEmployees();
     } catch (err) {
       alert(t('employees.deleteError'));

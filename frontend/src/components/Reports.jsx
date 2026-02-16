@@ -33,8 +33,8 @@ function Reports() {
       setLoading(true);
       setError(null);
       const [employeesRes, logsRes] = await Promise.all([
-        axios.get(`${API_URL}/employees/`),
-        axios.get(`${API_URL}/work-logs/`)
+        axios.get(`${API_URL}/employees`),
+        axios.get(`${API_URL}/work-logs`)
       ]);
       setEmployees(employeesRes.data);
       setWorkLogs(logsRes.data);

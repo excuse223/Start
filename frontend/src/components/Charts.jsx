@@ -38,8 +38,8 @@ function Charts({ summaryData }) {
     try {
       setLoading(true);
       const [employeesRes, logsRes] = await Promise.all([
-        axios.get(`${API_URL}/employees/`),
-        axios.get(`${API_URL}/work-logs/`)
+        axios.get(`${API_URL}/employees`),
+        axios.get(`${API_URL}/work-logs`)
       ]);
 
       const employees = employeesRes.data;

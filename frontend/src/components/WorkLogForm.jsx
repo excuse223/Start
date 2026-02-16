@@ -64,7 +64,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
         employee: employeeId,
         hours: hours
       };
-      await axios.post(`${API_URL}/work-logs/`, payload);
+      await axios.post(`${API_URL}/work-logs`, payload);
       onSuccess();
     } catch (err) {
       let errorMessage = t('workLogs.addError');
