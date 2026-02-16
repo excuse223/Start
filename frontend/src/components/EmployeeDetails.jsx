@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import API_URL from '../config';
 import axios from 'axios';
 import WorkLogForm from './WorkLogForm';
-
-const API_URL = 'http://localhost:8000/api';
 
 function EmployeeDetails() {
   const { t } = useTranslation();
