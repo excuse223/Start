@@ -59,11 +59,41 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
 
     try {
       setSubmitting(true);
-      const payload = {
-        ...formData,
-        employee: employeeId,
-        hours: hours
+      
+      // Map log_type to the correct hour field
+      const hourFields = {
+        work_hours: 0,
+        overtime_hours: 0,
+        vacation_hours: 0,
+        sick_leave_hours: 0,
+        other_hours: 0
       };
+
+      // Set the appropriate hour field based on log_type
+      switch (formData.log_type) {
+        case 'work':
+          hourFields.work_hours = hours;
+          break;
+        case 'overtime':
+          hourFields.overtime_hours = hours;
+          break;
+        case 'vacation':
+          hourFields.vacation_hours = hours;
+          break;
+        case 'sick':
+          hourFields.sick_leave_hours = hours;
+          break;
+        default:
+          hourFields.other_hours = hours;
+      }
+
+      const payload = {
+        employee_id: employeeId,
+        work_date: formData.date,
+        ...hourFields,
+        notes: formData.notes || ''
+      };
+      
       await axios.post(`${API_URL}/work-logs`, payload);
       onSuccess();
     } catch (err) {
