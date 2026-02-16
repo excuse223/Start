@@ -53,7 +53,7 @@ def validate_total_hours(work_log: WorkLogBase) -> Optional[str]:
         return f"Warning: Total hours ({total}) exceeds 12 hours per day"
     return None
 
-@router.get("/", response_model=List[WorkLogResponse])
+@router.get("", response_model=List[WorkLogResponse])
 def get_work_logs(
     employee_id: Optional[int] = None,
     start_date: Optional[date] = None,
@@ -123,7 +123,7 @@ def get_work_log(work_log_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Work log not found")
     return work_log
 
-@router.post("/", response_model=WorkLogResponse, status_code=201)
+@router.post("", response_model=WorkLogResponse, status_code=201)
 def create_work_log(work_log: WorkLogCreate, db: Session = Depends(get_db)):
     """Create a new work log"""
     # Check if employee exists
