@@ -12,6 +12,7 @@ import {
 import { Pie, Bar } from 'react-chartjs-2';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import API_URL from '../config';
 
 ChartJS.register(
   ArcElement,
@@ -22,8 +23,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-const API_URL = 'http://localhost:8000/api';
 
 function Charts({ summaryData }) {
   const { t } = useTranslation();
