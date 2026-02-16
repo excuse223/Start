@@ -77,6 +77,36 @@ def get_work_logs(
     work_logs = query.offset(skip).limit(limit).all()
     return work_logs
 
+@router.get("/summary")
+def get_work_logs_summary(db: Session = Depends(get_db)):
+    """Get summary of all work logs"""
+    work_logs = db.query(WorkLog).all()
+    
+    if not work_logs:
+        return {
+            "total_work_hours": 0,
+            "total_overtime_hours": 0,
+            "total_vacation_hours": 0,
+            "total_sick_leave_hours": 0,
+            "total_other_hours": 0,
+            "total_logs": 0
+        }
+    
+    total_work = sum(float(log.work_hours) for log in work_logs)
+    total_overtime = sum(float(log.overtime_hours) for log in work_logs)
+    total_vacation = sum(float(log.vacation_hours) for log in work_logs)
+    total_sick = sum(float(log.sick_leave_hours) for log in work_logs)
+    total_other = sum(float(log.other_hours) for log in work_logs)
+    
+    return {
+        "total_work_hours": total_work,
+        "total_overtime_hours": total_overtime,
+        "total_vacation_hours": total_vacation,
+        "total_sick_leave_hours": total_sick,
+        "total_other_hours": total_other,
+        "total_logs": len(work_logs)
+    }
+
 @router.get("/{work_log_id}", response_model=WorkLogResponse)
 def get_work_log(work_log_id: int, db: Session = Depends(get_db)):
     """Get work log by ID"""

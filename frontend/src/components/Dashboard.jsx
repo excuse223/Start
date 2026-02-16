@@ -18,7 +18,7 @@ function Dashboard() {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${API_URL}/work-logs/summary/`);
+      const response = await axios.get(`${API_URL}/work-logs/summary`);
       setSummary(response.data);
     } catch (err) {
       setError(t('common.error'));

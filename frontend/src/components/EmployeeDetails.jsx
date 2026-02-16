@@ -23,8 +23,8 @@ function EmployeeDetails() {
       setLoading(true);
       setError(null);
       const [employeeRes, logsRes] = await Promise.all([
-        axios.get(`${API_URL}/employees/${id}/`),
-        axios.get(`${API_URL}/work-logs/?employee=${id}`)
+        axios.get(`${API_URL}/employees/${id}`),
+        axios.get(`${API_URL}/work-logs?employee=${id}`)
       ]);
       setEmployee(employeeRes.data);
       setWorkLogs(logsRes.data);
@@ -45,7 +45,7 @@ function EmployeeDetails() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${API_URL}/employees/${id}/`, editData);
+      await axios.put(`${API_URL}/employees/${id}`, editData);
       setEmployee(editData);
       setEditMode(false);
     } catch (err) {
@@ -59,7 +59,7 @@ function EmployeeDetails() {
       return;
     }
     try {
-      await axios.delete(`${API_URL}/work-logs/${logId}/`);
+      await axios.delete(`${API_URL}/work-logs/${logId}`);
       fetchEmployeeData();
     } catch (err) {
       alert(t('workLogs.deleteError'));

@@ -251,3 +251,70 @@ def test_get_work_logs_with_filters():
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
+
+def test_get_work_logs_summary():
+    """Test getting summary of all work logs"""
+    # Test empty summary
+    response = client.get("/api/work-logs/summary")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total_work_hours"] == 0
+    assert data["total_overtime_hours"] == 0
+    assert data["total_vacation_hours"] == 0
+    assert data["total_sick_leave_hours"] == 0
+    assert data["total_other_hours"] == 0
+    assert data["total_logs"] == 0
+    
+    # Create an employee
+    employee_data = {
+        "first_name": "Test",
+        "last_name": "User",
+        "email": "test@example.com"
+    }
+    employee_response = client.post("/api/employees/", json=employee_data)
+    employee_id = employee_response.json()["id"]
+    
+    # Create multiple work logs with different hour types
+    work_logs_data = [
+        {
+            "employee_id": employee_id,
+            "work_date": "2024-01-01",
+            "work_hours": 8.0,
+            "overtime_hours": 2.0,
+            "vacation_hours": 0.0,
+            "sick_leave_hours": 0.0,
+            "other_hours": 0.0
+        },
+        {
+            "employee_id": employee_id,
+            "work_date": "2024-01-02",
+            "work_hours": 6.0,
+            "overtime_hours": 0.0,
+            "vacation_hours": 2.0,
+            "sick_leave_hours": 0.0,
+            "other_hours": 0.0
+        },
+        {
+            "employee_id": employee_id,
+            "work_date": "2024-01-03",
+            "work_hours": 0.0,
+            "overtime_hours": 0.0,
+            "vacation_hours": 0.0,
+            "sick_leave_hours": 8.0,
+            "other_hours": 0.0
+        }
+    ]
+    
+    for log_data in work_logs_data:
+        client.post("/api/work-logs/", json=log_data)
+    
+    # Get summary
+    response = client.get("/api/work-logs/summary")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total_work_hours"] == 14.0
+    assert data["total_overtime_hours"] == 2.0
+    assert data["total_vacation_hours"] == 2.0
+    assert data["total_sick_leave_hours"] == 8.0
+    assert data["total_other_hours"] == 0.0
+    assert data["total_logs"] == 3
