@@ -98,6 +98,7 @@ def get_work_logs_summary(db: Session = Depends(get_db)):
     total_sick = 0
     total_other = 0
     
+    # Convert Decimal to float for JSON serialization
     for log in work_logs:
         total_work += float(log.work_hours)
         total_overtime += float(log.overtime_hours)

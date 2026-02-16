@@ -247,7 +247,7 @@ def test_get_work_logs_with_filters():
         client.post("/api/work-logs", json=work_log_data)
     
     # Get work logs filtered by employee
-    response = client.get(f"/api/work-logs/?employee_id={employee_id}")
+    response = client.get(f"/api/work-logs?employee_id={employee_id}")
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
