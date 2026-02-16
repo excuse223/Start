@@ -92,11 +92,18 @@ def get_work_logs_summary(db: Session = Depends(get_db)):
             "total_logs": 0
         }
     
-    total_work = sum(float(log.work_hours) for log in work_logs)
-    total_overtime = sum(float(log.overtime_hours) for log in work_logs)
-    total_vacation = sum(float(log.vacation_hours) for log in work_logs)
-    total_sick = sum(float(log.sick_leave_hours) for log in work_logs)
-    total_other = sum(float(log.other_hours) for log in work_logs)
+    total_work = 0
+    total_overtime = 0
+    total_vacation = 0
+    total_sick = 0
+    total_other = 0
+    
+    for log in work_logs:
+        total_work += float(log.work_hours)
+        total_overtime += float(log.overtime_hours)
+        total_vacation += float(log.vacation_hours)
+        total_sick += float(log.sick_leave_hours)
+        total_other += float(log.other_hours)
     
     return {
         "total_work_hours": total_work,
