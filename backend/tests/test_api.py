@@ -52,7 +52,7 @@ def test_create_employee():
         "last_name": "Doe",
         "email": "john.doe@example.com"
     }
-    response = client.post("/api/employees/", json=employee_data)
+    response = client.post("/api/employees", json=employee_data)
     assert response.status_code == 201
     data = response.json()
     assert data["first_name"] == "John"
@@ -67,10 +67,10 @@ def test_get_employees():
         "last_name": "Smith",
         "email": "jane.smith@example.com"
     }
-    client.post("/api/employees/", json=employee_data)
+    client.post("/api/employees", json=employee_data)
     
     # Get employees list
-    response = client.get("/api/employees/")
+    response = client.get("/api/employees")
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -84,7 +84,7 @@ def test_get_employee_by_id():
         "last_name": "Johnson",
         "email": "bob@example.com"
     }
-    create_response = client.post("/api/employees/", json=employee_data)
+    create_response = client.post("/api/employees", json=employee_data)
     employee_id = create_response.json()["id"]
     
     # Get employee by ID
@@ -102,7 +102,7 @@ def test_update_employee():
         "last_name": "Williams",
         "email": "alice@example.com"
     }
-    create_response = client.post("/api/employees/", json=employee_data)
+    create_response = client.post("/api/employees", json=employee_data)
     employee_id = create_response.json()["id"]
     
     # Update employee
@@ -125,7 +125,7 @@ def test_delete_employee():
         "last_name": "Brown",
         "email": "charlie@example.com"
     }
-    create_response = client.post("/api/employees/", json=employee_data)
+    create_response = client.post("/api/employees", json=employee_data)
     employee_id = create_response.json()["id"]
     
     # Delete employee
@@ -144,7 +144,7 @@ def test_create_work_log():
         "last_name": "Lee",
         "email": "david@example.com"
     }
-    employee_response = client.post("/api/employees/", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data)
     employee_id = employee_response.json()["id"]
     
     # Create work log
@@ -158,7 +158,7 @@ def test_create_work_log():
         "other_hours": 0.0,
         "notes": "Test work log"
     }
-    response = client.post("/api/work-logs/", json=work_log_data)
+    response = client.post("/api/work-logs", json=work_log_data)
     assert response.status_code == 201
     data = response.json()
     assert data["work_hours"] == "8.00"
@@ -172,7 +172,7 @@ def test_work_log_validation_warning():
         "last_name": "Martinez",
         "email": "eve@example.com"
     }
-    employee_response = client.post("/api/employees/", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data)
     employee_id = employee_response.json()["id"]
     
     # Create work log with > 12 hours
@@ -186,7 +186,7 @@ def test_work_log_validation_warning():
         "other_hours": 0.0,
         "notes": "Long day"
     }
-    response = client.post("/api/work-logs/", json=work_log_data)
+    response = client.post("/api/work-logs", json=work_log_data)
     assert response.status_code == 201
     data = response.json()
     # Should have a warning
@@ -201,7 +201,7 @@ def test_work_log_duplicate_date():
         "last_name": "Garcia",
         "email": "frank@example.com"
     }
-    employee_response = client.post("/api/employees/", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data)
     employee_id = employee_response.json()["id"]
     
     # Create first work log
@@ -214,11 +214,11 @@ def test_work_log_duplicate_date():
         "sick_leave_hours": 0.0,
         "other_hours": 0.0
     }
-    response1 = client.post("/api/work-logs/", json=work_log_data)
+    response1 = client.post("/api/work-logs", json=work_log_data)
     assert response1.status_code == 201
     
     # Try to create duplicate
-    response2 = client.post("/api/work-logs/", json=work_log_data)
+    response2 = client.post("/api/work-logs", json=work_log_data)
     assert response2.status_code == 400
     assert "already exists" in response2.json()["detail"]
 
@@ -230,7 +230,7 @@ def test_get_work_logs_with_filters():
         "last_name": "Taylor",
         "email": "grace@example.com"
     }
-    employee_response = client.post("/api/employees/", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data)
     employee_id = employee_response.json()["id"]
     
     # Create work logs
@@ -244,7 +244,7 @@ def test_get_work_logs_with_filters():
             "sick_leave_hours": 0.0,
             "other_hours": 0.0
         }
-        client.post("/api/work-logs/", json=work_log_data)
+        client.post("/api/work-logs", json=work_log_data)
     
     # Get work logs filtered by employee
     response = client.get(f"/api/work-logs/?employee_id={employee_id}")
@@ -271,7 +271,7 @@ def test_get_work_logs_summary():
         "last_name": "User",
         "email": "test@example.com"
     }
-    employee_response = client.post("/api/employees/", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data)
     employee_id = employee_response.json()["id"]
     
     # Create multiple work logs with different hour types
@@ -306,7 +306,7 @@ def test_get_work_logs_summary():
     ]
     
     for log_data in work_logs_data:
-        client.post("/api/work-logs/", json=log_data)
+        client.post("/api/work-logs", json=log_data)
     
     # Get summary
     response = client.get("/api/work-logs/summary")
