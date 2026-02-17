@@ -50,23 +50,44 @@ function Reports() {
     let filtered = [...workLogs];
 
     if (filters.employee) {
-      filtered = filtered.filter(log => log.employee === parseInt(filters.employee));
+      filtered = filtered.filter(log => log.employee_id === parseInt(filters.employee));
     }
 
     if (filters.startDate) {
-      filtered = filtered.filter(log => log.date >= filters.startDate);
+      filtered = filtered.filter(log => log.work_date >= filters.startDate);
     }
 
     if (filters.endDate) {
-      filtered = filtered.filter(log => log.date <= filters.endDate);
+      filtered = filtered.filter(log => log.work_date <= filters.endDate);
     }
 
     if (filters.logType) {
-      filtered = filtered.filter(log => log.log_type === filters.logType);
+      filtered = filtered.filter(log => {
+        const logType = getLogType(log);
+        return logType === filters.logType;
+      });
     }
 
     setFilteredLogs(filtered);
     calculateStats(filtered);
+  };
+
+  const getLogType = (log) => {
+    if (parseFloat(log.work_hours) > 0) return 'work';
+    if (parseFloat(log.overtime_hours) > 0) return 'overtime';
+    if (parseFloat(log.vacation_hours) > 0) return 'vacation';
+    if (parseFloat(log.sick_leave_hours) > 0) return 'sick';
+    return 'other';
+  };
+
+  const getTotalHours = (log) => {
+    return (
+      parseFloat(log.work_hours || 0) +
+      parseFloat(log.overtime_hours || 0) +
+      parseFloat(log.vacation_hours || 0) +
+      parseFloat(log.sick_leave_hours || 0) +
+      parseFloat(log.other_hours || 0)
+    );
   };
 
   const calculateStats = (logs) => {
@@ -80,25 +101,17 @@ function Reports() {
     };
 
     logs.forEach(log => {
-      const hours = parseFloat(log.hours);
-      stats.totalHours += hours;
-      
-      switch (log.log_type) {
-        case 'work':
-          stats.workHours += hours;
-          break;
-        case 'overtime':
-          stats.overtimeHours += hours;
-          break;
-        case 'vacation':
-          stats.vacationHours += hours;
-          break;
-        case 'sick':
-          stats.sickHours += hours;
-          break;
-        default:
-          break;
-      }
+      const workHours = parseFloat(log.work_hours || 0);
+      const overtimeHours = parseFloat(log.overtime_hours || 0);
+      const vacationHours = parseFloat(log.vacation_hours || 0);
+      const sickHours = parseFloat(log.sick_leave_hours || 0);
+      const otherHours = parseFloat(log.other_hours || 0);
+
+      stats.workHours += workHours;
+      stats.overtimeHours += overtimeHours;
+      stats.vacationHours += vacationHours;
+      stats.sickHours += sickHours;
+      stats.totalHours += workHours + overtimeHours + vacationHours + sickHours + otherHours;
     });
 
     setReportStats(stats);
@@ -130,12 +143,12 @@ function Reports() {
     // Create CSV content
     const headers = [t('workLogs.date'), t('employees.title'), t('common.type'), t('common.hours'), t('workLogs.notes')];
     const rows = filteredLogs.map(log => {
-      const employee = employees.find(e => e.id === log.employee);
+      const employee = employees.find(e => e.id === log.employee_id);
       return [
-        log.date,
+        log.work_date,
         employee ? `${employee.first_name} ${employee.last_name}` : 'Unknown',
-        log.log_type,
-        log.hours,
+        getLogType(log),
+        getTotalHours(log).toFixed(1),
         log.notes || ''
       ];
     });
@@ -298,14 +311,14 @@ function Reports() {
               <tbody>
                 {filteredLogs.map(log => (
                   <tr key={log.id}>
-                    <td>{new Date(log.date).toLocaleDateString()}</td>
-                    <td>{getEmployeeName(log.employee)}</td>
+                    <td>{new Date(log.work_date).toLocaleDateString()}</td>
+                    <td>{getEmployeeName(log.employee_id)}</td>
                     <td>
-                      <span className={`badge badge-${log.log_type}`}>
-                        {log.log_type}
+                      <span className={`badge badge-${getLogType(log)}`}>
+                        {getLogType(log)}
                       </span>
                     </td>
-                    <td>{log.hours}h</td>
+                    <td>{getTotalHours(log).toFixed(1)}h</td>
                     <td>{log.notes || '-'}</td>
                   </tr>
                 ))}
