@@ -19,9 +19,10 @@ class WorkLogBase(BaseModel):
     vacation_hours: Decimal = Decimal("0.0")
     sick_leave_hours: Decimal = Decimal("0.0")
     other_hours: Decimal = Decimal("0.0")
+    absent_hours: Decimal = Decimal("0.0")
     notes: Optional[str] = None
 
-    @field_validator('work_hours', 'overtime_hours', 'vacation_hours', 'sick_leave_hours', 'other_hours')
+    @field_validator('work_hours', 'overtime_hours', 'vacation_hours', 'sick_leave_hours', 'other_hours', 'absent_hours')
     @classmethod
     def validate_hours(cls, v):
         if v < 0:
@@ -47,7 +48,7 @@ def validate_total_hours(work_log: WorkLogBase) -> Optional[str]:
     """Validate total hours and return warning if > 12"""
     total = (work_log.work_hours + work_log.overtime_hours + 
              work_log.vacation_hours + work_log.sick_leave_hours + 
-             work_log.other_hours)
+             work_log.other_hours + work_log.absent_hours)
     
     if total > 12:
         return f"Warning: Total hours ({total}) exceeds 12 hours per day"
