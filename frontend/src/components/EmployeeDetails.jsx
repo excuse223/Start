@@ -238,21 +238,24 @@ function EmployeeDetails() {
               {t('workLogs.noLogs')}
             </p>
           ) : (
-            workLogs.map(log => (
-              <div 
-                key={log.id} 
-                className={`work-log-item ${getLogType(log)}`}
-                style={{ borderLeftColor: getLogTypeColor(getLogType(log)) }}
-              >
-                <div className="work-log-header">
-                  <div>
-                    <strong>{new Date(log.work_date).toLocaleDateString()}</strong>
-                    <span className={`badge badge-${getLogType(log)}`} style={{ marginLeft: '1rem' }}>
-                      {getLogType(log)}
-                    </span>
-                  </div>
-                  <div>
-                    <strong>{getTotalHours(log).toFixed(1)}h</strong>
+            workLogs.map(log => {
+              const logType = getLogType(log);
+              const totalHours = getTotalHours(log);
+              return (
+                <div 
+                  key={log.id} 
+                  className={`work-log-item ${logType}`}
+                  style={{ borderLeftColor: getLogTypeColor(logType) }}
+                >
+                  <div className="work-log-header">
+                    <div>
+                      <strong>{new Date(log.work_date).toLocaleDateString()}</strong>
+                      <span className={`badge badge-${logType}`} style={{ marginLeft: '1rem' }}>
+                        {logType}
+                      </span>
+                    </div>
+                    <div>
+                      <strong>{totalHours.toFixed(1)}h</strong>
                     <button 
                       className="btn btn-danger" 
                       style={{ marginLeft: '1rem' }}
@@ -260,15 +263,16 @@ function EmployeeDetails() {
                     >
                       {t('common.delete')}
                     </button>
+                    </div>
                   </div>
+                  {log.notes && (
+                    <div style={{ marginTop: '0.5rem', color: '#7f8c8d' }}>
+                      {log.notes}
+                    </div>
+                  )}
                 </div>
-                {log.notes && (
-                  <div style={{ marginTop: '0.5rem', color: '#7f8c8d' }}>
-                    {log.notes}
-                  </div>
-                )}
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
