@@ -76,8 +76,26 @@ function EmployeeDetails() {
     return colors[type] || '#95a5a6';
   };
 
+  const getLogType = (log) => {
+    if (parseFloat(log.work_hours) > 0) return 'work';
+    if (parseFloat(log.overtime_hours) > 0) return 'overtime';
+    if (parseFloat(log.vacation_hours) > 0) return 'vacation';
+    if (parseFloat(log.sick_leave_hours) > 0) return 'sick';
+    return 'other';
+  };
+
+  const getTotalHours = (log) => {
+    return (
+      parseFloat(log.work_hours || 0) +
+      parseFloat(log.overtime_hours || 0) +
+      parseFloat(log.vacation_hours || 0) +
+      parseFloat(log.sick_leave_hours || 0) +
+      parseFloat(log.other_hours || 0)
+    );
+  };
+
   const calculateTotalHours = () => {
-    return workLogs.reduce((sum, log) => sum + parseFloat(log.hours), 0).toFixed(1);
+    return workLogs.reduce((sum, log) => sum + getTotalHours(log), 0).toFixed(1);
   };
 
   if (loading) {
@@ -223,18 +241,18 @@ function EmployeeDetails() {
             workLogs.map(log => (
               <div 
                 key={log.id} 
-                className={`work-log-item ${log.log_type}`}
-                style={{ borderLeftColor: getLogTypeColor(log.log_type) }}
+                className={`work-log-item ${getLogType(log)}`}
+                style={{ borderLeftColor: getLogTypeColor(getLogType(log)) }}
               >
                 <div className="work-log-header">
                   <div>
-                    <strong>{new Date(log.date).toLocaleDateString()}</strong>
-                    <span className={`badge badge-${log.log_type}`} style={{ marginLeft: '1rem' }}>
-                      {log.log_type}
+                    <strong>{new Date(log.work_date).toLocaleDateString()}</strong>
+                    <span className={`badge badge-${getLogType(log)}`} style={{ marginLeft: '1rem' }}>
+                      {getLogType(log)}
                     </span>
                   </div>
                   <div>
-                    <strong>{log.hours}h</strong>
+                    <strong>{getTotalHours(log).toFixed(1)}h</strong>
                     <button 
                       className="btn btn-danger" 
                       style={{ marginLeft: '1rem' }}
