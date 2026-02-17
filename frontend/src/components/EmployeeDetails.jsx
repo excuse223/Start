@@ -76,8 +76,26 @@ function EmployeeDetails() {
     return colors[type] || '#95a5a6';
   };
 
+  const getLogType = (log) => {
+    if (parseFloat(log.work_hours) > 0) return 'work';
+    if (parseFloat(log.overtime_hours) > 0) return 'overtime';
+    if (parseFloat(log.vacation_hours) > 0) return 'vacation';
+    if (parseFloat(log.sick_leave_hours) > 0) return 'sick';
+    return 'other';
+  };
+
+  const getTotalHours = (log) => {
+    return (
+      parseFloat(log.work_hours || 0) +
+      parseFloat(log.overtime_hours || 0) +
+      parseFloat(log.vacation_hours || 0) +
+      parseFloat(log.sick_leave_hours || 0) +
+      parseFloat(log.other_hours || 0)
+    );
+  };
+
   const calculateTotalHours = () => {
-    return workLogs.reduce((sum, log) => sum + parseFloat(log.hours), 0).toFixed(1);
+    return workLogs.reduce((sum, log) => sum + getTotalHours(log), 0).toFixed(1);
   };
 
   if (loading) {
@@ -220,21 +238,24 @@ function EmployeeDetails() {
               {t('workLogs.noLogs')}
             </p>
           ) : (
-            workLogs.map(log => (
-              <div 
-                key={log.id} 
-                className={`work-log-item ${log.log_type}`}
-                style={{ borderLeftColor: getLogTypeColor(log.log_type) }}
-              >
-                <div className="work-log-header">
-                  <div>
-                    <strong>{new Date(log.date).toLocaleDateString()}</strong>
-                    <span className={`badge badge-${log.log_type}`} style={{ marginLeft: '1rem' }}>
-                      {log.log_type}
-                    </span>
-                  </div>
-                  <div>
-                    <strong>{log.hours}h</strong>
+            workLogs.map(log => {
+              const logType = getLogType(log);
+              const totalHours = getTotalHours(log);
+              return (
+                <div 
+                  key={log.id} 
+                  className={`work-log-item ${logType}`}
+                  style={{ borderLeftColor: getLogTypeColor(logType) }}
+                >
+                  <div className="work-log-header">
+                    <div>
+                      <strong>{new Date(log.work_date).toLocaleDateString()}</strong>
+                      <span className={`badge badge-${logType}`} style={{ marginLeft: '1rem' }}>
+                        {logType}
+                      </span>
+                    </div>
+                    <div>
+                      <strong>{totalHours.toFixed(1)}h</strong>
                     <button 
                       className="btn btn-danger" 
                       style={{ marginLeft: '1rem' }}
@@ -242,15 +263,16 @@ function EmployeeDetails() {
                     >
                       {t('common.delete')}
                     </button>
+                    </div>
                   </div>
+                  {log.notes && (
+                    <div style={{ marginTop: '0.5rem', color: '#7f8c8d' }}>
+                      {log.notes}
+                    </div>
+                  )}
                 </div>
-                {log.notes && (
-                  <div style={{ marginTop: '0.5rem', color: '#7f8c8d' }}>
-                    {log.notes}
-                  </div>
-                )}
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
