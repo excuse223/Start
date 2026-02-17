@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import API_URL from '../config';
+import PrintableReport from './PrintableReport';
 
 function Reports() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
+  const printableRef = useRef();
   const [employees, setEmployees] = useState([]);
   const [workLogs, setWorkLogs] = useState([]);
   const [filters, setFilters] = useState({
@@ -182,6 +187,43 @@ function Reports() {
     document.body.removeChild(link);
   };
 
+  const handlePrint = useReactToPrint({
+    content: () => printableRef.current,
+    documentTitle: `Work_Hours_Report_${new Date().toISOString().split('T')[0]}`,
+  });
+
+  const handleExportPDF = async () => {
+    if (filteredLogs.length === 0) {
+      alert(t('reports.noData'));
+      return;
+    }
+
+    try {
+      const element = printableRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        logging: false,
+        useCORS: true
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+      
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`work_hours_report_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert(t('reports.generateError'));
+    }
+  };
+
   const getEmployeeName = (employeeId) => {
     const employee = employees.find(e => e.id === employeeId);
     return employee ? `${employee.first_name} ${employee.last_name}` : 'Unknown';
@@ -267,6 +309,20 @@ function Reports() {
           >
             📥 {t('reports.exportToCsv')}
           </button>
+          <button 
+            className="btn btn-primary" 
+            onClick={handleExportPDF}
+            disabled={filteredLogs.length === 0}
+          >
+            📄 {t('reports.exportToPdf')}
+          </button>
+          <button 
+            className="btn btn-info" 
+            onClick={handlePrint}
+            disabled={filteredLogs.length === 0}
+          >
+            🖨️ {t('reports.print')}
+          </button>
         </div>
       </div>
 
@@ -338,6 +394,16 @@ function Reports() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Hidden printable report */}
+      <div style={{ display: 'none' }}>
+        <PrintableReport 
+          ref={printableRef}
+          reportData={{ filteredLogs, stats: reportStats }}
+          employees={employees}
+          filters={filters}
+        />
       </div>
     </div>
   );
