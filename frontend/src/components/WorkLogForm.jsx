@@ -17,11 +17,13 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
 
   const [formData, setFormData] = useState({
     date: getLocalDate(),
-    hours: '',
-    log_type: 'work',
+    work_hours: '',
+    overtime_hours: '',
+    vacation_hours: '',
+    sick_leave_hours: '',
+    other_hours: '',
     notes: ''
   });
-  const [showWarning, setShowWarning] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
@@ -30,67 +32,41 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
       ...prev,
       [name]: value
     }));
-
-    // Check if hours exceed 12
-    if (name === 'hours') {
-      const hours = parseFloat(value);
-      if (hours > 12) {
-        setShowWarning(true);
-      } else {
-        setShowWarning(false);
-      }
-    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
-    const hours = parseFloat(formData.hours);
-    if (isNaN(hours) || hours <= 0) {
+
+    // Validation - at least one hour type must be filled
+    const work = parseFloat(formData.work_hours) || 0;
+    const overtime = parseFloat(formData.overtime_hours) || 0;
+    const vacation = parseFloat(formData.vacation_hours) || 0;
+    const sick = parseFloat(formData.sick_leave_hours) || 0;
+    const other = parseFloat(formData.other_hours) || 0;
+
+    const totalHours = work + overtime + vacation + sick + other;
+
+    if (totalHours <= 0) {
       alert(t('workLogs.invalidHours'));
       return;
     }
 
-    if (hours > 24) {
+    if (totalHours > 24) {
       alert(t('workLogs.hoursExceed24'));
       return;
     }
 
     try {
       setSubmitting(true);
-      
-      // Map log_type to the correct hour field
-      const hourFields = {
-        work_hours: 0,
-        overtime_hours: 0,
-        vacation_hours: 0,
-        sick_leave_hours: 0,
-        other_hours: 0
-      };
-
-      // Set the appropriate hour field based on log_type
-      switch (formData.log_type) {
-        case 'work':
-          hourFields.work_hours = hours;
-          break;
-        case 'overtime':
-          hourFields.overtime_hours = hours;
-          break;
-        case 'vacation':
-          hourFields.vacation_hours = hours;
-          break;
-        case 'sick':
-          hourFields.sick_leave_hours = hours;
-          break;
-        default:
-          hourFields.other_hours = hours;
-      }
 
       const payload = {
         employee_id: employeeId,
         work_date: formData.date,
-        ...hourFields,
+        work_hours: work.toFixed(2),
+        overtime_hours: overtime.toFixed(2),
+        vacation_hours: vacation.toFixed(2),
+        sick_leave_hours: sick.toFixed(2),
+        other_hours: other.toFixed(2),
         notes: formData.notes || ''
       };
       
@@ -120,12 +96,6 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
   return (
     <form onSubmit={handleSubmit}>
       <h3>{t('workLogs.addWorkLog')}</h3>
-      
-      {showWarning && (
-        <div className="alert alert-warning">
-          ⚠️ {t('workLogs.warning12Hours', { hours: formData.hours })}
-        </div>
-      )}
 
       <div className="form-group">
         <label>{t('workLogs.date')} *</label>
@@ -139,37 +109,73 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
       </div>
 
       <div className="form-group">
-        <label>{t('common.hours')} *</label>
+        <label>{t('charts.workHours')}</label>
         <input
           type="number"
-          name="hours"
-          value={formData.hours}
+          name="work_hours"
+          value={formData.work_hours}
           onChange={handleInputChange}
           step="0.5"
-          min="0.5"
+          min="0"
           max="24"
-          required
-          placeholder="e.g., 8.0"
+          placeholder="0"
         />
-        <small className="form-error">
-          {formData.hours && parseFloat(formData.hours) > 12 && 
-            t('workLogs.warning12Hours', { hours: formData.hours })}
-        </small>
       </div>
 
       <div className="form-group">
-        <label>{t('common.type')} *</label>
-        <select
-          name="log_type"
-          value={formData.log_type}
+        <label>{t('charts.overtime')}</label>
+        <input
+          type="number"
+          name="overtime_hours"
+          value={formData.overtime_hours}
           onChange={handleInputChange}
-          required
-        >
-          <option value="work">{t('charts.workHours')}</option>
-          <option value="overtime">{t('charts.overtime')}</option>
-          <option value="vacation">{t('charts.vacation')}</option>
-          <option value="sick">{t('charts.sickLeave')}</option>
-        </select>
+          step="0.5"
+          min="0"
+          max="24"
+          placeholder="0"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>{t('charts.vacation')}</label>
+        <input
+          type="number"
+          name="vacation_hours"
+          value={formData.vacation_hours}
+          onChange={handleInputChange}
+          step="0.5"
+          min="0"
+          max="24"
+          placeholder="0"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>{t('charts.sickLeave')}</label>
+        <input
+          type="number"
+          name="sick_leave_hours"
+          value={formData.sick_leave_hours}
+          onChange={handleInputChange}
+          step="0.5"
+          min="0"
+          max="24"
+          placeholder="0"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>{t('charts.other')}</label>
+        <input
+          type="number"
+          name="other_hours"
+          value={formData.other_hours}
+          onChange={handleInputChange}
+          step="0.5"
+          min="0"
+          max="24"
+          placeholder="0"
+        />
       </div>
 
       <div className="form-group">
