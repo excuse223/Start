@@ -172,14 +172,14 @@ function EmployeeList() {
                         <Link 
                           to={`/employees/${employee.id}`} 
                           className="btn btn-primary"
-                          title={t('employees.view')}
+                          title={t('common.view')}
                         >
                           {t('employees.view')}
                         </Link>
                         <Link
                           to={`/reports?employee=${employee.id}`}
                           className="btn btn-info"
-                          title="View Reports"
+                          title={t('common.viewReports')}
                         >
                           📊
                         </Link>

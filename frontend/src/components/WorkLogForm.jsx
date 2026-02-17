@@ -62,11 +62,11 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
       const payload = {
         employee_id: employeeId,
         work_date: formData.date,
-        work_hours: work.toFixed(2),
-        overtime_hours: overtime.toFixed(2),
-        vacation_hours: vacation.toFixed(2),
-        sick_leave_hours: sick.toFixed(2),
-        other_hours: other.toFixed(2),
+        work_hours: work,
+        overtime_hours: overtime,
+        vacation_hours: vacation,
+        sick_leave_hours: sick,
+        other_hours: other,
         notes: formData.notes || ''
       };
       

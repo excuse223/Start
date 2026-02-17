@@ -20,7 +20,9 @@
     "allTypes": "Wszystkie Typy",
     "allEmployees": "Wszyscy Pracownicy",
     "type": "Typ",
-    "hours": "Godziny"
+    "hours": "Godziny",
+    "view": "Zobacz",
+    "viewReports": "Zobacz Raporty"
   },
   "navigation": {
     "dashboard": "Pulpit",

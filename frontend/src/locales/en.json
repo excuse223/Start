@@ -20,7 +20,9 @@
     "allTypes": "All Types",
     "allEmployees": "All Employees",
     "type": "Type",
-    "hours": "Hours"
+    "hours": "Hours",
+    "view": "View",
+    "viewReports": "View Reports"
   },
   "navigation": {
     "dashboard": "Dashboard",
