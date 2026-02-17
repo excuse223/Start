@@ -12,6 +12,7 @@ function Dashboard() {
 
   useEffect(() => {
     fetchSummary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchSummary = async () => {

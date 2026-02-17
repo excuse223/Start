@@ -31,6 +31,7 @@ function Charts({ summaryData }) {
 
   useEffect(() => {
     fetchEmployeeData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getTotalHours = (log) => {
