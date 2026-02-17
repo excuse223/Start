@@ -31,7 +31,18 @@ function Charts({ summaryData }) {
 
   useEffect(() => {
     fetchEmployeeData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getTotalHours = (log) => {
+    return (
+      parseFloat(log.work_hours || 0) +
+      parseFloat(log.overtime_hours || 0) +
+      parseFloat(log.vacation_hours || 0) +
+      parseFloat(log.sick_leave_hours || 0) +
+      parseFloat(log.other_hours || 0)
+    );
+  };
 
   const fetchEmployeeData = async () => {
     try {
@@ -46,8 +57,8 @@ function Charts({ summaryData }) {
 
       // Calculate hours per employee
       const employeeHours = employees.map(emp => {
-        const empLogs = logs.filter(log => log.employee === emp.id);
-        const totalHours = empLogs.reduce((sum, log) => sum + parseFloat(log.hours), 0);
+        const empLogs = logs.filter(log => log.employee_id === emp.id);
+        const totalHours = empLogs.reduce((sum, log) => sum + getTotalHours(log), 0);
         return {
           name: `${emp.first_name} ${emp.last_name}`,
           hours: totalHours

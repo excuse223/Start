@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 
 function Reports() {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [employees, setEmployees] = useState([]);
   const [workLogs, setWorkLogs] = useState([]);
   const [filters, setFilters] = useState({
@@ -20,6 +22,12 @@ function Reports() {
 
   useEffect(() => {
     fetchData();
+    
+    // Read employee parameter from URL
+    const employeeParam = searchParams.get('employee');
+    if (employeeParam) {
+      setFilters(prev => ({ ...prev, employee: employeeParam }));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
