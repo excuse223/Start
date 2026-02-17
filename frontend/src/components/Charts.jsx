@@ -72,7 +72,7 @@ function Charts({ summaryData }) {
           summaryData?.total_work_hours || 0,
           summaryData?.total_overtime_hours || 0,
           summaryData?.total_vacation_hours || 0,
-          summaryData?.total_sick_hours || 0
+          summaryData?.total_sick_leave_hours || 0
         ],
         backgroundColor: [
           'rgba(39, 174, 96, 0.8)',   // Green for work
@@ -195,7 +195,7 @@ function Charts({ summaryData }) {
     summaryData.total_work_hours > 0 ||
     summaryData.total_overtime_hours > 0 ||
     summaryData.total_vacation_hours > 0 ||
-    summaryData.total_sick_hours > 0
+    summaryData.total_sick_leave_hours > 0
   );
 
   if (!hasData) {

@@ -67,7 +67,7 @@ function Dashboard() {
         </div>
         <div className="summary-card sick">
           <h3>{t('dashboard.sickLeave')}</h3>
-          <div className="value">{summary?.total_sick_hours?.toFixed(1) || 0}h</div>
+          <div className="value">{summary?.total_sick_leave_hours?.toFixed(1) || 0}h</div>
         </div>
       </div>
 
