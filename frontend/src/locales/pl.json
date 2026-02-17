@@ -50,6 +50,10 @@
     "lastName": "Nazwisko",
     "email": "Email",
     "emailOptional": "Email (Opcjonalny)",
+    "hourlyRate": "Stawka Godzinowa",
+    "hourlyRateOptional": "Stawka Godzinowa (Opcjonalna)",
+    "overtimeRate": "Stawka Nadgodzin",
+    "overtimeRateOptional": "Stawka Nadgodzin (Opcjonalna)",
     "noEmployees": "Nie znaleziono pracowników. Dodaj pierwszego pracownika, aby rozpocząć.",
     "deleteConfirm": "Czy na pewno chcesz usunąć tego pracownika?",
     "addSuccess": "Pracownik dodany pomyślnie",
@@ -77,6 +81,7 @@
     "vacationHours": "Godziny Urlopu",
     "sickLeaveHours": "Godziny Zwolnienia",
     "otherHours": "Inne Godziny",
+    "absentHours": "Godziny Nieobecności (Nieoptacone)",
     "notes": "Notatki",
     "totalHours": "Suma Godzin",
     "selectEmployee": "Wybierz Pracownika",
@@ -110,7 +115,13 @@
     "noData": "Brak danych dla wybranego okresu",
     "generateError": "Nie udało się wygenerować raportu. Spróbuj ponownie.",
     "exportToCsv": "Eksportuj do CSV",
-    "totalLogs": "Suma Wpisów"
+    "exportToPdf": "Eksportuj do PDF",
+    "print": "Drukuj",
+    "totalLogs": "Suma Wpisów",
+    "totalCost": "Całkowity Koszt",
+    "costBreakdown": "Podział Kosztów",
+    "workCost": "Koszt Pracy",
+    "overtimeCost": "Koszt Nadgodzin"
   },
   "charts": {
     "title": "Wykresy",

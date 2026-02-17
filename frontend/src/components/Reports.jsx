@@ -94,7 +94,8 @@ function Reports() {
       parseFloat(log.overtime_hours || 0) +
       parseFloat(log.vacation_hours || 0) +
       parseFloat(log.sick_leave_hours || 0) +
-      parseFloat(log.other_hours || 0)
+      parseFloat(log.other_hours || 0) +
+      parseFloat(log.absent_hours || 0)
     );
   };
 
@@ -105,6 +106,7 @@ function Reports() {
       overtimeHours: 0,
       vacationHours: 0,
       sickHours: 0,
+      absentHours: 0,
       totalLogs: logs.length
     };
 
@@ -114,12 +116,14 @@ function Reports() {
       const vacationHours = parseFloat(log.vacation_hours || 0);
       const sickHours = parseFloat(log.sick_leave_hours || 0);
       const otherHours = parseFloat(log.other_hours || 0);
+      const absentHours = parseFloat(log.absent_hours || 0);
 
       stats.workHours += workHours;
       stats.overtimeHours += overtimeHours;
       stats.vacationHours += vacationHours;
       stats.sickHours += sickHours;
-      stats.totalHours += workHours + overtimeHours + vacationHours + sickHours + otherHours;
+      stats.absentHours += absentHours;
+      stats.totalHours += workHours + overtimeHours + vacationHours + sickHours + otherHours + absentHours;
     });
 
     setReportStats(stats);

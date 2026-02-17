@@ -50,6 +50,10 @@
     "lastName": "Last Name",
     "email": "Email",
     "emailOptional": "Email (Optional)",
+    "hourlyRate": "Hourly Rate",
+    "hourlyRateOptional": "Hourly Rate (Optional)",
+    "overtimeRate": "Overtime Rate",
+    "overtimeRateOptional": "Overtime Rate (Optional)",
     "noEmployees": "No employees found. Add your first employee to get started.",
     "deleteConfirm": "Are you sure you want to delete this employee?",
     "addSuccess": "Employee added successfully",
@@ -77,6 +81,7 @@
     "vacationHours": "Vacation Hours",
     "sickLeaveHours": "Sick Leave Hours",
     "otherHours": "Other Hours",
+    "absentHours": "Absent Hours (Unpaid)",
     "notes": "Notes",
     "totalHours": "Total Hours",
     "selectEmployee": "Select Employee",
@@ -110,7 +115,13 @@
     "noData": "No data available for the selected period",
     "generateError": "Failed to generate report. Please try again.",
     "exportToCsv": "Export to CSV",
-    "totalLogs": "Total Logs"
+    "exportToPdf": "Export to PDF",
+    "print": "Print",
+    "totalLogs": "Total Logs",
+    "totalCost": "Total Cost",
+    "costBreakdown": "Cost Breakdown",
+    "workCost": "Work Cost",
+    "overtimeCost": "Overtime Cost"
   },
   "charts": {
     "title": "Charts",

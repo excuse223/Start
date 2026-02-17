@@ -22,6 +22,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
     vacation_hours: '',
     sick_leave_hours: '',
     other_hours: '',
+    absent_hours: '',
     notes: ''
   });
   const [submitting, setSubmitting] = useState(false);
@@ -43,8 +44,9 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
     const vacation = parseFloat(formData.vacation_hours) || 0;
     const sick = parseFloat(formData.sick_leave_hours) || 0;
     const other = parseFloat(formData.other_hours) || 0;
+    const absent = parseFloat(formData.absent_hours) || 0;
 
-    const totalHours = work + overtime + vacation + sick + other;
+    const totalHours = work + overtime + vacation + sick + other + absent;
 
     if (totalHours <= 0) {
       alert(t('workLogs.invalidHours'));
@@ -67,6 +69,7 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
         vacation_hours: vacation,
         sick_leave_hours: sick,
         other_hours: other,
+        absent_hours: absent,
         notes: formData.notes || ''
       };
       
@@ -170,6 +173,20 @@ function WorkLogForm({ employeeId, onSuccess, onCancel }) {
           type="number"
           name="other_hours"
           value={formData.other_hours}
+          onChange={handleInputChange}
+          step="0.5"
+          min="0"
+          max="24"
+          placeholder="0"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>{t('workLogs.absentHours')}</label>
+        <input
+          type="number"
+          name="absent_hours"
+          value={formData.absent_hours}
           onChange={handleInputChange}
           step="0.5"
           min="0"
