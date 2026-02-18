@@ -48,7 +48,27 @@ function EmployeeList() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/employees`, formData);
+      // Filter out empty strings for optional numeric fields
+      const payload = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        ...(formData.email && { email: formData.email })
+      };
+      
+      // Helper function to add numeric field if valid
+      const addNumericField = (fieldName, fieldValue) => {
+        if (fieldValue !== '' && fieldValue !== undefined && fieldValue !== null) {
+          const numValue = parseFloat(fieldValue);
+          if (!isNaN(numValue)) {
+            payload[fieldName] = numValue;
+          }
+        }
+      };
+      
+      addNumericField('hourly_rate', formData.hourly_rate);
+      addNumericField('overtime_rate', formData.overtime_rate);
+      
+      await axios.post(`${API_URL}/employees`, payload);
       setShowAddForm(false);
       setFormData({ first_name: '', last_name: '', email: '', hourly_rate: '', overtime_rate: '' });
       fetchEmployees();
