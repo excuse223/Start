@@ -89,6 +89,7 @@ def get_work_logs_summary(db: Session = Depends(get_db)):
             "total_overtime_hours": 0,
             "total_vacation_hours": 0,
             "total_sick_leave_hours": 0,
+            "total_absent_hours": 0,
             "total_other_hours": 0,
             "total_logs": 0
         }
@@ -97,6 +98,7 @@ def get_work_logs_summary(db: Session = Depends(get_db)):
     total_overtime = 0
     total_vacation = 0
     total_sick = 0
+    total_absent = 0
     total_other = 0
     
     # Convert Decimal to float for JSON serialization
@@ -105,6 +107,7 @@ def get_work_logs_summary(db: Session = Depends(get_db)):
         total_overtime += float(log.overtime_hours)
         total_vacation += float(log.vacation_hours)
         total_sick += float(log.sick_leave_hours)
+        total_absent += float(log.absent_hours)
         total_other += float(log.other_hours)
     
     return {
@@ -112,6 +115,7 @@ def get_work_logs_summary(db: Session = Depends(get_db)):
         "total_overtime_hours": total_overtime,
         "total_vacation_hours": total_vacation,
         "total_sick_leave_hours": total_sick,
+        "total_absent_hours": total_absent,
         "total_other_hours": total_other,
         "total_logs": len(work_logs)
     }
