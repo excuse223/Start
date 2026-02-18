@@ -55,21 +55,18 @@ function EmployeeList() {
         ...(formData.email && { email: formData.email })
       };
       
-      // Add hourly_rate if valid (including 0)
-      if (formData.hourly_rate !== '' && formData.hourly_rate !== undefined) {
-        const hourlyRate = parseFloat(formData.hourly_rate);
-        if (!isNaN(hourlyRate)) {
-          payload.hourly_rate = hourlyRate;
+      // Helper function to add numeric field if valid
+      const addNumericField = (fieldName, fieldValue) => {
+        if (fieldValue !== '' && fieldValue !== undefined && fieldValue !== null) {
+          const numValue = parseFloat(fieldValue);
+          if (!isNaN(numValue)) {
+            payload[fieldName] = numValue;
+          }
         }
-      }
+      };
       
-      // Add overtime_rate if valid (including 0)
-      if (formData.overtime_rate !== '' && formData.overtime_rate !== undefined) {
-        const overtimeRate = parseFloat(formData.overtime_rate);
-        if (!isNaN(overtimeRate)) {
-          payload.overtime_rate = overtimeRate;
-        }
-      }
+      addNumericField('hourly_rate', formData.hourly_rate);
+      addNumericField('overtime_rate', formData.overtime_rate);
       
       await axios.post(`${API_URL}/employees`, payload);
       setShowAddForm(false);
