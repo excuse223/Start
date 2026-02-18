@@ -52,10 +52,24 @@ function EmployeeList() {
       const payload = {
         first_name: formData.first_name,
         last_name: formData.last_name,
-        email: formData.email || undefined,
-        ...(formData.hourly_rate && { hourly_rate: parseFloat(formData.hourly_rate) }),
-        ...(formData.overtime_rate && { overtime_rate: parseFloat(formData.overtime_rate) })
+        ...(formData.email && { email: formData.email })
       };
+      
+      // Add hourly_rate if valid
+      if (formData.hourly_rate) {
+        const hourlyRate = parseFloat(formData.hourly_rate);
+        if (!isNaN(hourlyRate)) {
+          payload.hourly_rate = hourlyRate;
+        }
+      }
+      
+      // Add overtime_rate if valid
+      if (formData.overtime_rate) {
+        const overtimeRate = parseFloat(formData.overtime_rate);
+        if (!isNaN(overtimeRate)) {
+          payload.overtime_rate = overtimeRate;
+        }
+      }
       
       await axios.post(`${API_URL}/employees`, payload);
       setShowAddForm(false);
