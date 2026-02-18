@@ -55,16 +55,16 @@ function EmployeeList() {
         ...(formData.email && { email: formData.email })
       };
       
-      // Add hourly_rate if valid
-      if (formData.hourly_rate) {
+      // Add hourly_rate if valid (including 0)
+      if (formData.hourly_rate !== '' && formData.hourly_rate !== undefined) {
         const hourlyRate = parseFloat(formData.hourly_rate);
         if (!isNaN(hourlyRate)) {
           payload.hourly_rate = hourlyRate;
         }
       }
       
-      // Add overtime_rate if valid
-      if (formData.overtime_rate) {
+      // Add overtime_rate if valid (including 0)
+      if (formData.overtime_rate !== '' && formData.overtime_rate !== undefined) {
         const overtimeRate = parseFloat(formData.overtime_rate);
         if (!isNaN(overtimeRate)) {
           payload.overtime_rate = overtimeRate;
