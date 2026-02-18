@@ -14,6 +14,7 @@ class WorkLog(Base):
     vacation_hours = Column(Numeric(5, 2), default=0.0)
     sick_leave_hours = Column(Numeric(5, 2), default=0.0)
     other_hours = Column(Numeric(5, 2), default=0.0)
+    absent_hours = Column(Numeric(5, 2), default=0.0)
     notes = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

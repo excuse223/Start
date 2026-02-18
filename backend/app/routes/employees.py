@@ -13,6 +13,8 @@ class EmployeeBase(BaseModel):
     first_name: str
     last_name: str
     email: Optional[EmailStr] = None
+    hourly_rate: Optional[float] = None
+    overtime_rate: Optional[float] = None
 
 class EmployeeCreate(EmployeeBase):
     pass

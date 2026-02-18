@@ -90,7 +90,8 @@ function EmployeeDetails() {
       parseFloat(log.overtime_hours || 0) +
       parseFloat(log.vacation_hours || 0) +
       parseFloat(log.sick_leave_hours || 0) +
-      parseFloat(log.other_hours || 0)
+      parseFloat(log.other_hours || 0) +
+      parseFloat(log.absent_hours || 0)
     );
   };
 
@@ -173,6 +174,28 @@ function EmployeeDetails() {
                 placeholder={t('employees.emailOptional')}
               />
             </div>
+            <div className="form-group">
+              <label>{t('employees.hourlyRateOptional')}</label>
+              <input
+                type="number"
+                value={editData.hourly_rate || ''}
+                onChange={(e) => setEditData({ ...editData, hourly_rate: e.target.value })}
+                step="0.01"
+                min="0"
+                placeholder={t('employees.hourlyRateOptional')}
+              />
+            </div>
+            <div className="form-group">
+              <label>{t('employees.overtimeRateOptional')}</label>
+              <input
+                type="number"
+                value={editData.overtime_rate || ''}
+                onChange={(e) => setEditData({ ...editData, overtime_rate: e.target.value })}
+                step="0.01"
+                min="0"
+                placeholder={t('employees.overtimeRateOptional')}
+              />
+            </div>
             <div className="btn-group">
               <button type="submit" className="btn btn-success">
                 {t('employees.saveChanges')}
@@ -199,6 +222,14 @@ function EmployeeDetails() {
             <div className="info-item">
               <label>{t('employees.email')}</label>
               <div className="value">{employee.email || t('employees.notProvided')}</div>
+            </div>
+            <div className="info-item">
+              <label>{t('employees.hourlyRate')}</label>
+              <div className="value">{employee.hourly_rate ? `${employee.hourly_rate} PLN` : t('employees.notProvided')}</div>
+            </div>
+            <div className="info-item">
+              <label>{t('employees.overtimeRate')}</label>
+              <div className="value">{employee.overtime_rate ? `${employee.overtime_rate} PLN` : t('employees.notProvided')}</div>
             </div>
             <div className="info-item">
               <label>{t('employees.totalHoursLogged')}</label>

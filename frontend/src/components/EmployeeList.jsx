@@ -13,7 +13,9 @@ function EmployeeList() {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    email: ''
+    email: '',
+    hourly_rate: '',
+    overtime_rate: ''
   });
 
   useEffect(() => {
@@ -48,7 +50,7 @@ function EmployeeList() {
     try {
       await axios.post(`${API_URL}/employees`, formData);
       setShowAddForm(false);
-      setFormData({ first_name: '', last_name: '', email: '' });
+      setFormData({ first_name: '', last_name: '', email: '', hourly_rate: '', overtime_rate: '' });
       fetchEmployees();
     } catch (err) {
       alert(t('employees.addError'));
@@ -125,6 +127,30 @@ function EmployeeList() {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder={t('employees.emailOptional')}
+              />
+            </div>
+            <div className="form-group">
+              <label>{t('employees.hourlyRateOptional')}</label>
+              <input
+                type="number"
+                name="hourly_rate"
+                value={formData.hourly_rate}
+                onChange={handleInputChange}
+                step="0.01"
+                min="0"
+                placeholder={t('employees.hourlyRateOptional')}
+              />
+            </div>
+            <div className="form-group">
+              <label>{t('employees.overtimeRateOptional')}</label>
+              <input
+                type="number"
+                name="overtime_rate"
+                value={formData.overtime_rate}
+                onChange={handleInputChange}
+                step="0.01"
+                min="0"
+                placeholder={t('employees.overtimeRateOptional')}
               />
             </div>
             <div className="btn-group">

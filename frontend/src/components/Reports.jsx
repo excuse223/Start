@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import API_URL from '../config';
+import PrintableReport from './PrintableReport';
 
 function Reports() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
+  const printableRef = useRef();
   const [employees, setEmployees] = useState([]);
   const [workLogs, setWorkLogs] = useState([]);
   const [filters, setFilters] = useState({
@@ -94,7 +99,8 @@ function Reports() {
       parseFloat(log.overtime_hours || 0) +
       parseFloat(log.vacation_hours || 0) +
       parseFloat(log.sick_leave_hours || 0) +
-      parseFloat(log.other_hours || 0)
+      parseFloat(log.other_hours || 0) +
+      parseFloat(log.absent_hours || 0)
     );
   };
 
@@ -105,6 +111,7 @@ function Reports() {
       overtimeHours: 0,
       vacationHours: 0,
       sickHours: 0,
+      absentHours: 0,
       totalLogs: logs.length
     };
 
@@ -114,12 +121,14 @@ function Reports() {
       const vacationHours = parseFloat(log.vacation_hours || 0);
       const sickHours = parseFloat(log.sick_leave_hours || 0);
       const otherHours = parseFloat(log.other_hours || 0);
+      const absentHours = parseFloat(log.absent_hours || 0);
 
       stats.workHours += workHours;
       stats.overtimeHours += overtimeHours;
       stats.vacationHours += vacationHours;
       stats.sickHours += sickHours;
-      stats.totalHours += workHours + overtimeHours + vacationHours + sickHours + otherHours;
+      stats.absentHours += absentHours;
+      stats.totalHours += workHours + overtimeHours + vacationHours + sickHours + otherHours + absentHours;
     });
 
     setReportStats(stats);
@@ -176,6 +185,43 @@ function Reports() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => printableRef.current,
+    documentTitle: `Work_Hours_Report_${new Date().toISOString().split('T')[0]}`,
+  });
+
+  const handleExportPDF = async () => {
+    if (filteredLogs.length === 0) {
+      alert(t('reports.noData'));
+      return;
+    }
+
+    try {
+      const element = printableRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        logging: false,
+        useCORS: true
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+      
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`work_hours_report_${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert(t('reports.generateError'));
+    }
   };
 
   const getEmployeeName = (employeeId) => {
@@ -263,6 +309,20 @@ function Reports() {
           >
             📥 {t('reports.exportToCsv')}
           </button>
+          <button 
+            className="btn btn-primary" 
+            onClick={handleExportPDF}
+            disabled={filteredLogs.length === 0}
+          >
+            📄 {t('reports.exportToPdf')}
+          </button>
+          <button 
+            className="btn btn-info" 
+            onClick={handlePrint}
+            disabled={filteredLogs.length === 0}
+          >
+            🖨️ {t('reports.print')}
+          </button>
         </div>
       </div>
 
@@ -334,6 +394,16 @@ function Reports() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Hidden printable report */}
+      <div style={{ display: 'none' }}>
+        <PrintableReport 
+          ref={printableRef}
+          reportData={{ filteredLogs, stats: reportStats }}
+          employees={employees}
+          filters={filters}
+        />
       </div>
     </div>
   );
