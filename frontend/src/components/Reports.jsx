@@ -37,12 +37,8 @@ function Reports() {
   }, []);
 
   useEffect(() => {
-    // If date or employee filters change, refetch from backend
-    if (filters.employee || filters.startDate || filters.endDate) {
-      fetchData();
-    } else {
-      applyFilters();
-    }
+    // Refetch from backend whenever filters change
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.employee, filters.startDate, filters.endDate]);
 
