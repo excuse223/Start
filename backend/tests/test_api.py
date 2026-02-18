@@ -59,6 +59,53 @@ def test_create_employee():
     assert data["last_name"] == "Doe"
     assert "id" in data
 
+def test_create_employee_without_optional_fields():
+    """Test creating an employee without optional fields (email, hourly_rate, overtime_rate)"""
+    employee_data = {
+        "first_name": "Jane",
+        "last_name": "Smith"
+    }
+    response = client.post("/api/employees", json=employee_data)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["first_name"] == "Jane"
+    assert data["last_name"] == "Smith"
+    assert data["email"] is None
+    assert data["hourly_rate"] is None
+    assert data["overtime_rate"] is None
+    assert "id" in data
+
+def test_create_employee_with_hourly_rate():
+    """Test creating an employee with hourly_rate"""
+    employee_data = {
+        "first_name": "Bob",
+        "last_name": "Johnson",
+        "email": "bob@example.com",
+        "hourly_rate": 25.50
+    }
+    response = client.post("/api/employees", json=employee_data)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["first_name"] == "Bob"
+    assert data["last_name"] == "Johnson"
+    assert data["hourly_rate"] == 25.50
+    assert data["overtime_rate"] is None
+
+def test_create_employee_with_zero_hourly_rate():
+    """Test creating an employee with zero hourly_rate (0 is a valid value)"""
+    employee_data = {
+        "first_name": "Alice",
+        "last_name": "Brown",
+        "hourly_rate": 0.0
+    }
+    response = client.post("/api/employees", json=employee_data)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["first_name"] == "Alice"
+    assert data["last_name"] == "Brown"
+    assert data["hourly_rate"] == 0.0
+
+
 def test_get_employees():
     """Test getting list of employees"""
     # Create an employee first
