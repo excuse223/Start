@@ -262,6 +262,7 @@ def test_get_work_logs_summary():
     assert data["total_overtime_hours"] == 0
     assert data["total_vacation_hours"] == 0
     assert data["total_sick_leave_hours"] == 0
+    assert data["total_absent_hours"] == 0
     assert data["total_other_hours"] == 0
     assert data["total_logs"] == 0
     
@@ -283,6 +284,7 @@ def test_get_work_logs_summary():
             "overtime_hours": 2.0,
             "vacation_hours": 0.0,
             "sick_leave_hours": 0.0,
+            "absent_hours": 0.0,
             "other_hours": 0.0
         },
         {
@@ -292,6 +294,7 @@ def test_get_work_logs_summary():
             "overtime_hours": 0.0,
             "vacation_hours": 2.0,
             "sick_leave_hours": 0.0,
+            "absent_hours": 0.0,
             "other_hours": 0.0
         },
         {
@@ -301,6 +304,17 @@ def test_get_work_logs_summary():
             "overtime_hours": 0.0,
             "vacation_hours": 0.0,
             "sick_leave_hours": 8.0,
+            "absent_hours": 0.0,
+            "other_hours": 0.0
+        },
+        {
+            "employee_id": employee_id,
+            "work_date": "2024-01-04",
+            "work_hours": 0.0,
+            "overtime_hours": 0.0,
+            "vacation_hours": 0.0,
+            "sick_leave_hours": 0.0,
+            "absent_hours": 8.0,
             "other_hours": 0.0
         }
     ]
@@ -316,5 +330,6 @@ def test_get_work_logs_summary():
     assert data["total_overtime_hours"] == 2.0
     assert data["total_vacation_hours"] == 2.0
     assert data["total_sick_leave_hours"] == 8.0
+    assert data["total_absent_hours"] == 8.0
     assert data["total_other_hours"] == 0.0
-    assert data["total_logs"] == 3
+    assert data["total_logs"] == 4
