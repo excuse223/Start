@@ -209,7 +209,7 @@ function Reports() {
   };
 
   const handlePrint = useReactToPrint({
-    content: () => printableRef.current,
+    contentRef: printableRef,
     documentTitle: `Work_Hours_Report_${new Date().toISOString().split('T')[0]}`,
   });
 
@@ -221,23 +221,51 @@ function Reports() {
 
     try {
       const element = printableRef.current;
+      if (!element) {
+        throw new Error('Printable element not found');
+      }
+
       const canvas = await html2canvas(element, {
         scale: 2,
         logging: false,
-        useCORS: true
+        useCORS: true,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
       });
       
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // PDF dimensions in mm
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 10;
       
-      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      // Canvas dimensions in pixels - convert to mm
+      const imgWidthPx = canvas.width;
+      const imgHeightPx = canvas.height;
+      
+      // Convert pixels to mm (assuming 96 DPI)
+      const pxToMm = 0.264583;
+      const imgWidthMm = imgWidthPx * pxToMm;
+      const imgHeightMm = imgHeightPx * pxToMm;
+      
+      // Calculate scaling to fit on page with margins
+      const marginMm = 10;
+      const maxWidthMm = pdfWidth - (2 * marginMm);
+      const maxHeightMm = pdfHeight - (2 * marginMm);
+      
+      const widthRatio = maxWidthMm / imgWidthMm;
+      const heightRatio = maxHeightMm / imgHeightMm;
+      const ratio = Math.min(widthRatio, heightRatio, 1); // Don't scale up
+      
+      const finalWidthMm = imgWidthMm * ratio;
+      const finalHeightMm = imgHeightMm * ratio;
+      
+      // Center the image
+      const xPos = (pdfWidth - finalWidthMm) / 2;
+      const yPos = marginMm;
+      
+      pdf.addImage(imgData, 'PNG', xPos, yPos, finalWidthMm, finalHeightMm);
       pdf.save(`work_hours_report_${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -417,8 +445,8 @@ function Reports() {
         )}
       </div>
 
-      {/* Hidden printable report */}
-      <div style={{ display: 'none' }}>
+      {/* Hidden printable report - positioned off-screen but still rendered */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0, width: '210mm' }}>
         <PrintableReport 
           ref={printableRef}
           reportData={{ filteredLogs, stats: reportStats }}
