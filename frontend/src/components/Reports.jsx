@@ -244,7 +244,8 @@ function Reports() {
       const imgWidthPx = canvas.width;
       const imgHeightPx = canvas.height;
       
-      // Convert pixels to mm (assuming 96 DPI)
+      // Convert pixels to mm (assuming standard web DPI of 96)
+      // For different DPI contexts, this conversion factor may need adjustment
       const pxToMm = 0.264583;
       const imgWidthMm = imgWidthPx * pxToMm;
       const imgHeightMm = imgHeightPx * pxToMm;
@@ -256,7 +257,7 @@ function Reports() {
       
       const widthRatio = maxWidthMm / imgWidthMm;
       const heightRatio = maxHeightMm / imgHeightMm;
-      const ratio = Math.min(widthRatio, heightRatio, 1); // Don't scale up
+      const ratio = Math.min(widthRatio, heightRatio, 1); // Prevent upscaling to maintain image quality
       
       const finalWidthMm = imgWidthMm * ratio;
       const finalHeightMm = imgHeightMm * ratio;
