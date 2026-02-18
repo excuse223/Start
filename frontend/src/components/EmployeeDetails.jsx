@@ -23,7 +23,7 @@ function EmployeeDetails() {
       setError(null);
       const [employeeRes, logsRes] = await Promise.all([
         axios.get(`${API_URL}/employees/${id}`),
-        axios.get(`${API_URL}/work-logs?employee=${id}`)
+        axios.get(`${API_URL}/work-logs?employee_id=${id}`)
       ]);
       setEmployee(employeeRes.data);
       setWorkLogs(logsRes.data);

@@ -37,17 +37,38 @@ function Reports() {
   }, []);
 
   useEffect(() => {
+    // Refetch from backend whenever filters change
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.employee, filters.startDate, filters.endDate]);
+
+  useEffect(() => {
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, workLogs]);
+  }, [filters.logType, workLogs]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
+      
+      // Build query params for work logs
+      const params = new URLSearchParams();
+      if (filters.employee) {
+        params.append('employee_id', filters.employee);
+      }
+      if (filters.startDate) {
+        params.append('start_date', filters.startDate);
+      }
+      if (filters.endDate) {
+        params.append('end_date', filters.endDate);
+      }
+      
+      const workLogsUrl = `${API_URL}/work-logs${params.toString() ? '?' + params.toString() : ''}`;
+      
       const [employeesRes, logsRes] = await Promise.all([
         axios.get(`${API_URL}/employees`),
-        axios.get(`${API_URL}/work-logs`)
+        axios.get(workLogsUrl)
       ]);
       setEmployees(employeesRes.data);
       setWorkLogs(logsRes.data);
