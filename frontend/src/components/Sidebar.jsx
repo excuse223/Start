@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 
 function Sidebar() {
   const { t, i18n } = useTranslation();
+  const { user, logout } = useAuth();
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -52,6 +54,15 @@ function Sidebar() {
           {t('navigation.reports')}
         </NavLink>
       </nav>
+      {user && (
+        <div className="sidebar-user">
+          <span className="sidebar-username">{user.username}</span>
+          <span className="sidebar-role">{user.role}</span>
+          <button onClick={logout} className="sidebar-logout">
+            {t('common.logout')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -22,7 +22,8 @@
     "type": "Typ",
     "hours": "Godziny",
     "view": "Zobacz",
-    "viewReports": "Zobacz Raporty"
+    "viewReports": "Zobacz Raporty",
+    "logout": "Wyloguj"
   },
   "navigation": {
     "dashboard": "Pulpit",
