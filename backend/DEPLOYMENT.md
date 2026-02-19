@@ -1,0 +1,284 @@
+# Deployment Guide — Work Hours Tracker
+
+Complete guide for deploying the Work Hours Tracker on a Ubuntu 22.04 VPS.
+
+---
+
+## Prerequisites
+
+- Ubuntu 22.04 LTS VPS (1 GB RAM minimum)
+- Domain name pointed at the server
+- Root or sudo access
+
+```bash
+# Install required packages
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y python3 python3-pip python3-venv postgresql nginx certbot python3-certbot-nginx ufw
+```
+
+---
+
+## Quick Start (6 steps)
+
+```bash
+# 1. Clone repo
+git clone https://github.com/excuse223/Start.git
+cd Start/backend
+
+# 2. Run production setup (generates secrets, configures DB, sets up cron)
+sudo bash scripts/production-setup.sh
+
+# 3. Update domain in .env.production
+nano .env.production
+# Change: ALLOWED_ORIGINS=https://your-actual-domain.com
+
+# 4. Setup SSL
+sudo certbot --nginx -d yourdomain.com
+
+# 5. Configure Nginx (see section below)
+sudo nano /etc/nginx/sites-available/work-hours-tracker
+
+# 6. Start with uvicorn (or PM2)
+APP_ENV=production uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+---
+
+## Nginx Configuration
+
+Create `/etc/nginx/sites-available/work-hours-tracker`:
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com www.yourdomain.com;
+
+    ssl_certificate     /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    # Rate limiting at Nginx level (extra layer on top of app-level limiting)
+    limit_req_zone $binary_remote_addr zone=api:10m rate=60r/m;
+    limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
+
+    location /api/auth/login {
+        limit_req zone=login burst=5 nodelay;
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api/ {
+        limit_req zone=api burst=20 nodelay;
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        root /var/www/work-hours-tracker;
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+Enable the site:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/work-hours-tracker /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+---
+
+## SSL Setup with Let's Encrypt
+
+```bash
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+# Auto-renew (added by certbot automatically, verify with):
+sudo certbot renew --dry-run
+```
+
+---
+
+## PM2 Process Manager
+
+```bash
+npm install -g pm2
+
+# Start app
+APP_ENV=production pm2 start \
+    "uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2" \
+    --name work-hours-tracker
+
+# Enable auto-restart on reboot
+pm2 startup
+pm2 save
+```
+
+Alternatively, use systemd:
+
+```ini
+# /etc/systemd/system/work-hours-tracker.service
+[Unit]
+Description=Work Hours Tracker API
+After=network.target postgresql.service
+
+[Service]
+User=www-data
+WorkingDirectory=/path/to/Start/backend
+EnvironmentFile=/path/to/Start/backend/.env.production
+ExecStart=/usr/local/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now work-hours-tracker
+```
+
+---
+
+## Monitoring
+
+```bash
+# Application logs
+tail -f /var/log/work-hours-tracker/combined.log
+tail -f /var/log/work-hours-tracker/error.log
+tail -f /var/log/work-hours-tracker/security.log
+
+# Failed login attempts
+grep "Failed login" /var/log/work-hours-tracker/security.log
+
+# Nginx logs
+tail -f /var/log/nginx/access.log
+tail -f /var/log/nginx/error.log
+```
+
+---
+
+## Backup & Restore
+
+```bash
+# Manual backup
+cd /path/to/Start/backend
+APP_ENV=production python scripts/backup.py
+
+# Verify all backups
+APP_ENV=production python scripts/verify-backup.py
+
+# Restore (interactive)
+APP_ENV=production python scripts/restore.py
+
+# Restore specific file
+APP_ENV=production python scripts/restore.py /var/backups/work-hours-tracker/backup_20240101_020000.sql.gz
+
+# Automatic daily backup (installed by production-setup.sh)
+# Cron: 0 2 * * * — runs at 02:00 AM every day
+crontab -l | grep backup
+```
+
+---
+
+## Security Checklist (Pre-Deployment)
+
+- [ ] JWT_SECRET is random 64-char hex (generated by production-setup.sh)
+- [ ] Admin password changed from default
+- [ ] Database password is not "postgres"
+- [ ] ALLOWED_ORIGINS set to actual domain (not wildcard)
+- [ ] SSL certificate installed and working
+- [ ] Firewall enabled (ports 22, 80, 443 only)
+- [ ] Nginx rate limiting configured
+- [ ] PM2 / systemd auto-restart configured
+- [ ] Daily backups scheduled in cron
+- [ ] Log directory `/var/log/work-hours-tracker` exists with correct permissions
+- [ ] Backup directory `/var/backups/work-hours-tracker` exists with correct permissions
+- [ ] Database user `work_hours_user` has minimum required permissions (no DROP, TRUNCATE)
+- [ ] `.env.production` has permissions `600` (owner read/write only)
+
+---
+
+## Maintenance
+
+```bash
+# Update application
+cd /path/to/Start
+git pull
+cd backend
+pip install -r requirements.txt
+alembic upgrade head
+pm2 restart work-hours-tracker  # or: sudo systemctl restart work-hours-tracker
+
+# View backup logs
+cat /var/log/work-hours-tracker/backup.log
+
+# Check disk usage
+du -sh /var/backups/work-hours-tracker/
+```
+
+---
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Server exits on startup | Insecure defaults in production | Set proper JWT_SECRET / DB password |
+| 429 Too Many Requests | Rate limit exceeded | Wait 15 min (login) or 1 min (API) |
+| CORS errors in browser | Origin not in ALLOWED_ORIGINS | Add domain to ALLOWED_ORIGINS in .env |
+| 502 Bad Gateway | App not running | `pm2 status` / `systemctl status` |
+| DB connection refused | PostgreSQL not running | `sudo systemctl start postgresql` |
+
+---
+
+## Emergency Procedures
+
+If the server is compromised:
+
+```bash
+# 1. Immediately revoke JWT tokens by changing JWT_SECRET
+nano .env.production
+# Change JWT_SECRET to a new random value
+
+# 2. Restart app to invalidate all existing sessions
+pm2 restart work-hours-tracker
+
+# 3. Change all passwords
+sudo -u postgres psql -c "ALTER ROLE work_hours_user PASSWORD 'new_password';"
+
+# 4. Check security logs for suspicious activity
+grep -E "(Failed login|Security event)" /var/log/work-hours-tracker/security.log | tail -100
+
+# 5. Block suspicious IPs
+sudo ufw deny from <suspicious-ip>
+```
+
+---
+
+## Performance Tuning
+
+```bash
+# Increase uvicorn workers (rule of thumb: 2 * CPU cores + 1)
+uvicorn app.main:app --workers 5
+
+# PostgreSQL connection pooling — add to DATABASE_URL
+# postgresql://user:pass@localhost/db?pool_size=10&max_overflow=20
+
+# Enable Nginx gzip (already configured in the template above)
+```
