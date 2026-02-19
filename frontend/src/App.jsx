@@ -8,6 +8,8 @@ import Dashboard from './components/Dashboard';
 import EmployeeList from './components/EmployeeList';
 import EmployeeDetails from './components/EmployeeDetails';
 import Reports from './components/Reports';
+import Users from './pages/Users';
+import Assignments from './pages/Assignments';
 import './App.css';
 
 function ProtectedLayout() {
@@ -38,6 +40,8 @@ function App() {
             <Route path="/employees" element={<EmployeeList />} />
             <Route path="/employees/:id" element={<EmployeeDetails />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/assignments" element={<Assignments />} />
           </Route>
         </Routes>
       </AuthProvider>

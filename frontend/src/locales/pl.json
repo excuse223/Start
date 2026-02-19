@@ -28,7 +28,9 @@
   "navigation": {
     "dashboard": "Pulpit",
     "employees": "Pracownicy",
-    "reports": "Raporty"
+    "reports": "Raporty",
+    "users": "Użytkownicy",
+    "assignments": "Przypisania"
   },
   "dashboard": {
     "title": "Pulpit",

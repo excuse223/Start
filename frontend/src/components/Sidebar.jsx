@@ -46,6 +46,24 @@ function Sidebar() {
           <span>👥</span>
           {t('navigation.employees')}
         </NavLink>
+        {user?.role === 'admin' && (
+          <NavLink 
+            to="/users" 
+            className={({ isActive }) => isActive ? 'active' : ''}
+          >
+            <span>👤</span>
+            {t('navigation.users')}
+          </NavLink>
+        )}
+        {user?.role === 'admin' && (
+          <NavLink 
+            to="/assignments" 
+            className={({ isActive }) => isActive ? 'active' : ''}
+          >
+            <span>👔</span>
+            {t('navigation.assignments')}
+          </NavLink>
+        )}
         <NavLink 
           to="/reports" 
           className={({ isActive }) => isActive ? 'active' : ''}
