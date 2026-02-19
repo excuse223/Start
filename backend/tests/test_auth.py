@@ -141,3 +141,66 @@ def test_logout_without_token():
     """Test logout without token returns 403."""
     response = client.post("/api/auth/logout")
     assert response.status_code == 403
+
+
+# --- Change password tests ---
+
+def test_change_password_success():
+    """Test successful password change."""
+    _create_user("changeuser", "oldpass123", "employee")
+
+    login_response = client.post("/api/auth/login", json={"username": "changeuser", "password": "oldpass123"})
+    token = login_response.json()["token"]
+
+    response = client.post(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"currentPassword": "oldpass123", "newPassword": "newpass456"},
+    )
+    assert response.status_code == 200
+    assert response.json()["message"] == "Password changed successfully"
+
+    # Verify new password works
+    login2 = client.post("/api/auth/login", json={"username": "changeuser", "password": "newpass456"})
+    assert login2.status_code == 200
+
+
+def test_change_password_wrong_current():
+    """Test change password with wrong current password returns 401."""
+    _create_user("changeuser2", "correct123", "employee")
+
+    login_response = client.post("/api/auth/login", json={"username": "changeuser2", "password": "correct123"})
+    token = login_response.json()["token"]
+
+    response = client.post(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"currentPassword": "wrong", "newPassword": "newpass456"},
+    )
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Current password is incorrect"
+
+
+def test_change_password_too_short():
+    """Test change password with too short new password returns 400."""
+    _create_user("changeuser3", "pass123", "employee")
+
+    login_response = client.post("/api/auth/login", json={"username": "changeuser3", "password": "pass123"})
+    token = login_response.json()["token"]
+
+    response = client.post(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"currentPassword": "pass123", "newPassword": "abc"},
+    )
+    assert response.status_code == 400
+    assert "at least 6 characters" in response.json()["detail"]
+
+
+def test_change_password_without_token():
+    """Test change password without token returns 403."""
+    response = client.post(
+        "/api/auth/change-password",
+        json={"currentPassword": "old", "newPassword": "newpass456"},
+    )
+    assert response.status_code == 403
