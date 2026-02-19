@@ -22,7 +22,8 @@
     "type": "Type",
     "hours": "Hours",
     "view": "View",
-    "viewReports": "View Reports"
+    "viewReports": "View Reports",
+    "logout": "Logout"
   },
   "navigation": {
     "dashboard": "Dashboard",
