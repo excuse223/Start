@@ -121,7 +121,7 @@ const PrintableReport = React.forwardRef(({
             </div>
             <div className="stat-item">
               <div className="stat-label">{t('workLogs.absentHours')}</div>
-              <div className="stat-value">{reportData.stats.absentHours?.toFixed(1) || '0.0'}h</div>
+              <div className="stat-value">{(reportData.stats.absentHours ?? 0).toFixed(1)}h</div>
             </div>
             <div className="stat-item">
               <div className="stat-label">{t('workLogs.totalHours')}</div>
