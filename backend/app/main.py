@@ -10,6 +10,8 @@ import os
 
 from app.routes import employees, work_logs, reports
 from app.routes import auth
+from app.routes import users as users_router_module
+from app.routes import assignments as assignments_router_module
 from app.database import engine, Base
 from app.middleware.security import (
     SecurityHeadersMiddleware,
@@ -67,6 +69,8 @@ app.include_router(employees.router, prefix="/api/employees", tags=["employees"]
 app.include_router(work_logs.router, prefix="/api/work-logs", tags=["work-logs"])
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(users_router_module.router, prefix="/api/users", tags=["users"])
+app.include_router(assignments_router_module.router, prefix="/api/assignments", tags=["assignments"])
 
 @app.get("/")
 async def root():

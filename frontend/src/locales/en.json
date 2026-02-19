@@ -28,7 +28,9 @@
   "navigation": {
     "dashboard": "Dashboard",
     "employees": "Employees",
-    "reports": "Reports"
+    "reports": "Reports",
+    "users": "Users",
+    "assignments": "Assignments"
   },
   "dashboard": {
     "title": "Dashboard",
