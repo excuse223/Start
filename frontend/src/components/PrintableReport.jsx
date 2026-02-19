@@ -8,6 +8,11 @@ const PrintableReport = React.forwardRef(({
 }, ref) => {
   const { t } = useTranslation();
 
+  // Add safety checks
+  if (!reportData || !reportData.filteredLogs) {
+    return null;
+  }
+
   const getEmployeeName = (employeeId) => {
     const employee = employees.find(e => e.id === employeeId);
     return employee ? `${employee.first_name} ${employee.last_name}` : 'Unknown';
@@ -90,39 +95,41 @@ const PrintableReport = React.forwardRef(({
         )}
       </div>
 
-      <div className="report-stats">
-        <h2>{t('dashboard.statistics')}</h2>
-        <div className="stats-grid">
-          <div className="stat-item">
-            <div className="stat-label">{t('reports.totalLogs')}</div>
-            <div className="stat-value">{reportData.stats.totalLogs}</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-label">{t('charts.workHours')}</div>
-            <div className="stat-value">{reportData.stats.workHours.toFixed(1)}h</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-label">{t('charts.overtime')}</div>
-            <div className="stat-value">{reportData.stats.overtimeHours.toFixed(1)}h</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-label">{t('charts.vacation')}</div>
-            <div className="stat-value">{reportData.stats.vacationHours.toFixed(1)}h</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-label">{t('charts.sickLeave')}</div>
-            <div className="stat-value">{reportData.stats.sickHours.toFixed(1)}h</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-label">{t('workLogs.absentHours')}</div>
-            <div className="stat-value">{reportData.stats.absentHours.toFixed(1)}h</div>
-          </div>
-          <div className="stat-item">
-            <div className="stat-label">{t('workLogs.totalHours')}</div>
-            <div className="stat-value">{reportData.stats.totalHours.toFixed(1)}h</div>
+      {reportData.stats && (
+        <div className="report-stats">
+          <h2>{t('dashboard.statistics')}</h2>
+          <div className="stats-grid">
+            <div className="stat-item">
+              <div className="stat-label">{t('reports.totalLogs')}</div>
+              <div className="stat-value">{reportData.stats.totalLogs}</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-label">{t('charts.workHours')}</div>
+              <div className="stat-value">{reportData.stats.workHours.toFixed(1)}h</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-label">{t('charts.overtime')}</div>
+              <div className="stat-value">{reportData.stats.overtimeHours.toFixed(1)}h</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-label">{t('charts.vacation')}</div>
+              <div className="stat-value">{reportData.stats.vacationHours.toFixed(1)}h</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-label">{t('charts.sickLeave')}</div>
+              <div className="stat-value">{reportData.stats.sickHours.toFixed(1)}h</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-label">{t('workLogs.absentHours')}</div>
+              <div className="stat-value">{reportData.stats.absentHours?.toFixed(1) || '0.0'}h</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-label">{t('workLogs.totalHours')}</div>
+              <div className="stat-value">{reportData.stats.totalHours.toFixed(1)}h</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {hasAnyCosts && (
         <div className="report-costs">
