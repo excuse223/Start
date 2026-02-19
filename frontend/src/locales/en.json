@@ -71,7 +71,9 @@
     "cancelEdit": "Cancel Edit",
     "view": "View",
     "notProvided": "Not provided",
-    "totalHoursLogged": "Total Hours Logged"
+    "totalHoursLogged": "Total Hours Logged",
+    "lastEntry": "Last Entry",
+    "noEntriesYet": "No entries yet"
   },
   "workLogs": {
     "title": "Work Logs",
