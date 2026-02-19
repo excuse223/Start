@@ -74,21 +74,23 @@ function Assignments() {
 
   const handleAssign = async () => {
     if (selectedToAssign.length === 0) return;
-    try {
-      await Promise.all(
-        selectedToAssign.map(empId =>
-          axios.post(`${API_URL}/assignments`, {
-            manager_user_id: Number(selectedManager),
-            employee_id: empId,
-          })
-        )
-      );
-      setModalOpen(false);
-      setSelectedToAssign([]);
-      fetchAssignments(selectedManager);
-    } catch (err) {
-      const msg = err.response?.data?.detail || 'Failed to assign employee.';
-      alert(msg);
+    const errors = [];
+    await Promise.all(
+      selectedToAssign.map(empId =>
+        axios.post(`${API_URL}/assignments`, {
+          manager_user_id: Number(selectedManager),
+          employee_id: empId,
+        }).catch(err => {
+          const msg = err.response?.data?.detail || `Failed to assign employee #${empId}.`;
+          errors.push(msg);
+        })
+      )
+    );
+    setModalOpen(false);
+    setSelectedToAssign([]);
+    fetchAssignments(selectedManager);
+    if (errors.length > 0) {
+      alert('Some assignments failed:\n' + errors.join('\n'));
     }
   };
 

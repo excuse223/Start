@@ -9,15 +9,26 @@ function generatePassword() {
   const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
   const lower = 'abcdefghjkmnpqrstuvwxyz';
   const digits = '23456789';
-  const all = upper + lower + digits + '!@#$%';
+  const special = '!@#$%';
+  const all = upper + lower + digits + special;
+  const array = new Uint32Array(12);
+  window.crypto.getRandomValues(array);
   let pwd = '';
-  pwd += upper[Math.floor(Math.random() * upper.length)];
-  pwd += lower[Math.floor(Math.random() * lower.length)];
-  pwd += digits[Math.floor(Math.random() * digits.length)];
+  pwd += upper[array[0] % upper.length];
+  pwd += lower[array[1] % lower.length];
+  pwd += digits[array[2] % digits.length];
   for (let i = 3; i < 12; i++) {
-    pwd += all[Math.floor(Math.random() * all.length)];
+    pwd += all[array[i] % all.length];
   }
-  return pwd.split('').sort(() => Math.random() - 0.5).join('');
+  // Shuffle using Fisher-Yates with crypto random
+  const shuffleArr = pwd.split('');
+  const shuffleRand = new Uint32Array(shuffleArr.length);
+  window.crypto.getRandomValues(shuffleRand);
+  for (let i = shuffleArr.length - 1; i > 0; i--) {
+    const j = shuffleRand[i] % (i + 1);
+    [shuffleArr[i], shuffleArr[j]] = [shuffleArr[j], shuffleArr[i]];
+  }
+  return shuffleArr.join('');
 }
 
 function UserModal({ editingUser, employees, onSaved, onClose }) {

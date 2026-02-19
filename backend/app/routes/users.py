@@ -168,13 +168,12 @@ def update_user(
 
     if data.role is not None:
         user.role = data.role
-    if data.employee_id is not None:
-        employee = db.query(Employee).filter(Employee.id == data.employee_id).first()
-        if not employee:
-            raise HTTPException(status_code=400, detail="Employee not found")
+    if 'employee_id' in data.model_fields_set:
+        if data.employee_id is not None:
+            employee = db.query(Employee).filter(Employee.id == data.employee_id).first()
+            if not employee:
+                raise HTTPException(status_code=400, detail="Employee not found")
         user.employee_id = data.employee_id
-    elif 'employee_id' in data.model_fields_set:
-        user.employee_id = None
 
     db.commit()
     db.refresh(user)
