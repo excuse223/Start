@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import employees, work_logs, reports
+from app.routes import auth
 from app.database import engine, Base
 
 app = FastAPI(
@@ -24,6 +25,7 @@ app.add_middleware(
 app.include_router(employees.router, prefix="/api/employees", tags=["employees"])
 app.include_router(work_logs.router, prefix="/api/work-logs", tags=["work-logs"])
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 
 @app.get("/")
 async def root():
@@ -37,3 +39,5 @@ async def health():
 @app.on_event("startup")
 async def startup():
     Base.metadata.create_all(bind=engine)
+    from init_db import init_database
+    init_database()
