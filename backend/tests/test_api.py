@@ -27,6 +27,7 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def cleanup():
     """Clean up database after each test"""
+    app.dependency_overrides[get_db] = override_get_db
     yield
     # Clean up tables
     Base.metadata.drop_all(bind=engine)
