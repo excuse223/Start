@@ -71,7 +71,9 @@
     "cancelEdit": "Anuluj Edycję",
     "view": "Zobacz",
     "notProvided": "Nie podano",
-    "totalHoursLogged": "Łączna Liczba Godzin"
+    "totalHoursLogged": "Łączna Liczba Godzin",
+    "lastEntry": "Ostatni wpis",
+    "noEntriesYet": "Brak wpisów"
   },
   "workLogs": {
     "title": "Wpisy Godzin Pracy",

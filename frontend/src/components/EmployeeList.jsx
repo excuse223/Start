@@ -4,6 +4,23 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import API_URL from '../config';
 
+function formatLastEntry(lastEntry, t) {
+  if (!lastEntry) return t('employees.noEntriesYet');
+  const todayUTC = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date();
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  const yesterdayUTC = yesterday.toISOString().slice(0, 10);
+  const entryDateStr = lastEntry.date;
+  let label;
+  if (entryDateStr === todayUTC) label = 'Today';
+  else if (entryDateStr === yesterdayUTC) label = 'Yesterday';
+  else {
+    const diffDays = Math.round((new Date(todayUTC) - new Date(entryDateStr)) / (1000 * 60 * 60 * 24));
+    label = `${diffDays}d ago`;
+  }
+  return `${label} (${lastEntry.work_hours}h)`;
+}
+
 function EmployeeList() {
   const { t } = useTranslation();
   const [employees, setEmployees] = useState([]);
@@ -194,25 +211,27 @@ function EmployeeList() {
           <table>
             <thead>
               <tr>
-                <th>{t('employees.firstName')}</th>
-                <th>{t('employees.lastName')}</th>
+                <th>ID</th>
+                <th>{t('employees.firstName')} / {t('employees.lastName')}</th>
                 <th>{t('employees.email')}</th>
+                <th>{t('employees.lastEntry')}</th>
                 <th>{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {employees.length === 0 ? (
                 <tr>
-                  <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
                     {t('employees.noEmployees')}
                   </td>
                 </tr>
               ) : (
                 employees.map(employee => (
                   <tr key={employee.id}>
-                    <td>{employee.first_name}</td>
-                    <td>{employee.last_name}</td>
+                    <td>{employee.id}</td>
+                    <td>{employee.first_name} {employee.last_name}</td>
                     <td>{employee.email || '-'}</td>
+                    <td>{formatLastEntry(employee.last_entry, t)}</td>
                     <td>
                       <div className="btn-group">
                         <Link 
