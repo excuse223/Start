@@ -132,11 +132,11 @@ function Users() {
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th className="col-hide-mobile">ID</th>
                   <th>Username</th>
                   <th>Role</th>
                   <th>Linked Employee</th>
-                  <th>Created</th>
+                  <th className="col-hide-mobile">Created</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -150,7 +150,7 @@ function Users() {
                 ) : (
                   filteredUsers.map(u => (
                     <tr key={u.id}>
-                      <td>{u.id}</td>
+                      <td className="col-hide-mobile">{u.id}</td>
                       <td>{u.username}</td>
                       <td>
                         <span className={roleBadgeClass(u.role)}>
@@ -162,7 +162,7 @@ function Users() {
                           ? `${u.employee.first_name} ${u.employee.last_name}`
                           : '-'}
                       </td>
-                      <td>{new Date(u.created_at).toLocaleDateString()}</td>
+                      <td className="col-hide-mobile">{new Date(u.created_at).toLocaleDateString()}</td>
                       <td>
                         <div className="btn-group">
                           <button
