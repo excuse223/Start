@@ -2,6 +2,9 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import ThemeToggle from './ThemeToggle';
+import NotificationBell from './NotificationBell';
+import GlobalSearch from './GlobalSearch';
 
 function Sidebar() {
   const { t, i18n } = useTranslation();
@@ -12,9 +15,17 @@ function Sidebar() {
     localStorage.setItem('language', lng);
   };
 
+  const isAdmin = user?.role === 'admin';
+  const isAdminOrManager = isAdmin || user?.role === 'manager';
+
   return (
     <div className="sidebar">
       <h1>Work Hours</h1>
+
+      <div className="sidebar-search">
+        <GlobalSearch />
+      </div>
+
       <div className="language-switcher">
         <button 
           onClick={() => changeLanguage('pl')} 
@@ -31,49 +42,68 @@ function Sidebar() {
           🇬🇧 EN
         </button>
       </div>
+
       <nav>
-        <NavLink 
-          to="/dashboard" 
-          className={({ isActive }) => isActive ? 'active' : ''}
-        >
+        <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'active' : ''}>
           <span>📊</span>
           {t('navigation.dashboard')}
         </NavLink>
-        <NavLink 
-          to="/employees" 
-          className={({ isActive }) => isActive ? 'active' : ''}
-        >
+        <NavLink to="/employees" className={({ isActive }) => isActive ? 'active' : ''}>
           <span>👥</span>
           {t('navigation.employees')}
         </NavLink>
-        {user?.role === 'admin' && (
-          <NavLink 
-            to="/users" 
-            className={({ isActive }) => isActive ? 'active' : ''}
-          >
+        <NavLink to="/calendar" className={({ isActive }) => isActive ? 'active' : ''}>
+          <span>📅</span>
+          {t('navigation.calendar', 'Calendar')}
+        </NavLink>
+        {isAdminOrManager && (
+          <NavLink to="/projects" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span>📁</span>
+            {t('navigation.projects', 'Projects')}
+          </NavLink>
+        )}
+        <NavLink to="/reports" className={({ isActive }) => isActive ? 'active' : ''}>
+          <span>📈</span>
+          {t('navigation.reports')}
+        </NavLink>
+        {isAdmin && (
+          <NavLink to="/users" className={({ isActive }) => isActive ? 'active' : ''}>
             <span>👤</span>
             {t('navigation.users')}
           </NavLink>
         )}
-        {user?.role === 'admin' && (
-          <NavLink 
-            to="/assignments" 
-            className={({ isActive }) => isActive ? 'active' : ''}
-          >
+        {isAdmin && (
+          <NavLink to="/assignments" className={({ isActive }) => isActive ? 'active' : ''}>
             <span>👔</span>
             {t('navigation.assignments')}
           </NavLink>
         )}
-        <NavLink 
-          to="/reports" 
-          className={({ isActive }) => isActive ? 'active' : ''}
-        >
-          <span>📈</span>
-          {t('navigation.reports')}
-        </NavLink>
+        {isAdmin && (
+          <NavLink to="/backups" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span>💾</span>
+            {t('navigation.backups', 'Backups')}
+          </NavLink>
+        )}
+        {isAdmin && (
+          <NavLink to="/audit-logs" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span>📋</span>
+            {t('navigation.auditLogs', 'Audit Logs')}
+          </NavLink>
+        )}
+        {isAdmin && (
+          <NavLink to="/settings" className={({ isActive }) => isActive ? 'active' : ''}>
+            <span>⚙️</span>
+            {t('navigation.settings', 'Settings')}
+          </NavLink>
+        )}
       </nav>
+
       {user && (
         <div className="sidebar-user">
+          <div className="sidebar-user-actions">
+            <NotificationBell />
+            <ThemeToggle />
+          </div>
           <span className="sidebar-username">{user.username}</span>
           <span className="sidebar-role">{user.role}</span>
           <button onClick={logout} className="sidebar-logout">

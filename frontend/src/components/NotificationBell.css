@@ -1,0 +1,125 @@
+.notification-bell-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.bell-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: relative;
+  padding: 0.3rem 0.4rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.bell-btn:hover {
+  background: var(--sidebar-hover, rgba(255,255,255,0.1));
+}
+
+.unread-badge {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  background: #e53e3e;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 50%;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  background: var(--card-bg, #fff);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px var(--shadow-lg, rgba(0,0,0,0.15));
+  border: 1px solid var(--border, #e0e0e0);
+  z-index: 2000;
+  overflow: hidden;
+}
+
+.notif-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary, #2c3e50);
+  border-bottom: 1px solid var(--border-light, #f0f0f0);
+  background: var(--table-header-bg, #f8f9fa);
+}
+
+.mark-all-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4a90e2;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mark-all-btn:hover { text-decoration: underline; }
+
+.notif-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted, #888);
+  font-size: 0.9rem;
+}
+
+.notif-list {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-light, #f0f0f0);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.notif-item:hover {
+  background: var(--table-hover-bg, #fafafa);
+}
+
+.notif-item.unread {
+  background: #eff6ff;
+  border-left: 3px solid #4a90e2;
+}
+
+.notif-item.unread:hover {
+  background: #dbeafe;
+}
+
+.notif-title {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--text-primary, #2c3e50);
+  margin-bottom: 0.2rem;
+}
+
+.notif-message {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #555);
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-time {
+  font-size: 0.75rem;
+  color: var(--text-muted, #888);
+}

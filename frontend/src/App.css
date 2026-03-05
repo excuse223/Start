@@ -137,6 +137,18 @@ body {
   gap: 0.25rem;
 }
 
+.sidebar-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-search {
+  padding: 0 1.5rem;
+  margin-bottom: 1rem;
+}
+
 .sidebar-username {
   font-weight: 600;
   font-size: 0.9rem;
