@@ -75,7 +75,21 @@ def validate_all(env: str = "production") -> None:
 def get_allowed_origins() -> list[str]:
     """Return list of allowed CORS origins from environment."""
     origins_str = os.getenv("ALLOWED_ORIGINS", "")
-    if not origins_str:
-        # Default: allow localhost only (safe for development)
-        return ["http://localhost:3000", "http://localhost:5173", "http://localhost:8080"]
-    return [o.strip() for o in origins_str.split(",") if o.strip()]
+    origins = [o.strip() for o in origins_str.split(",") if o.strip()] if origins_str else []
+
+    # Always include localhost for development
+    localhost_origins = ["http://localhost:3000", "http://localhost:5173", "http://localhost:8080"]
+    for lo in localhost_origins:
+        if lo not in origins:
+            origins.append(lo)
+
+    # Auto-detect GitHub Codespaces
+    codespace_name = os.getenv("CODESPACE_NAME")
+    if codespace_name:
+        domain = os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "app.github.dev")
+        for port in ["3000", "5173", "8080"]:
+            cs_origin = f"https://{codespace_name}-{port}.{domain}"
+            if cs_origin not in origins:
+                origins.append(cs_origin)
+
+    return origins
