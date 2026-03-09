@@ -2,8 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from passlib.context import CryptContext
 from app.main import app
 from app.database import Base, get_db
+from app.models import User
 
 # Create test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -12,6 +14,9 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 # Create tables
 Base.metadata.create_all(bind=engine)
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def override_get_db():
     try:
@@ -23,6 +28,29 @@ def override_get_db():
 app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
+
+
+def _create_admin(username="test_admin", password="TestPass1"):
+    db = TestingSessionLocal()
+    try:
+        user = User(username=username, password_hash=pwd_context.hash(password), role="admin")
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return user
+    finally:
+        db.close()
+
+
+def _get_token(username="test_admin", password="TestPass1"):
+    resp = client.post("/api/auth/login", json={"username": username, "password": password})
+    assert resp.status_code == 200, resp.text
+    return resp.json()["token"]
+
+
+def _auth_headers(token):
+    return {"Authorization": f"Bearer {token}"}
+
 
 @pytest.fixture(autouse=True)
 def cleanup():
@@ -48,12 +76,15 @@ def test_health_check():
 
 def test_create_employee():
     """Test creating an employee"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     employee_data = {
         "first_name": "John",
         "last_name": "Doe",
         "email": "john.doe@example.com"
     }
-    response = client.post("/api/employees", json=employee_data)
+    response = client.post("/api/employees", json=employee_data, headers=headers)
     assert response.status_code == 201
     data = response.json()
     assert data["first_name"] == "John"
@@ -62,11 +93,14 @@ def test_create_employee():
 
 def test_create_employee_without_optional_fields():
     """Test creating an employee without optional fields (email, hourly_rate, overtime_rate)"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     employee_data = {
         "first_name": "Jane",
         "last_name": "Smith"
     }
-    response = client.post("/api/employees", json=employee_data)
+    response = client.post("/api/employees", json=employee_data, headers=headers)
     assert response.status_code == 201
     data = response.json()
     assert data["first_name"] == "Jane"
@@ -78,13 +112,16 @@ def test_create_employee_without_optional_fields():
 
 def test_create_employee_with_hourly_rate():
     """Test creating an employee with hourly_rate"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     employee_data = {
         "first_name": "Bob",
         "last_name": "Johnson",
         "email": "bob@example.com",
         "hourly_rate": 25.50
     }
-    response = client.post("/api/employees", json=employee_data)
+    response = client.post("/api/employees", json=employee_data, headers=headers)
     assert response.status_code == 201
     data = response.json()
     assert data["first_name"] == "Bob"
@@ -94,12 +131,15 @@ def test_create_employee_with_hourly_rate():
 
 def test_create_employee_with_zero_hourly_rate():
     """Test creating an employee with zero hourly_rate (0 is a valid value)"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     employee_data = {
         "first_name": "Alice",
         "last_name": "Brown",
         "hourly_rate": 0.0
     }
-    response = client.post("/api/employees", json=employee_data)
+    response = client.post("/api/employees", json=employee_data, headers=headers)
     assert response.status_code == 201
     data = response.json()
     assert data["first_name"] == "Alice"
@@ -109,16 +149,19 @@ def test_create_employee_with_zero_hourly_rate():
 
 def test_get_employees():
     """Test getting list of employees"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Create an employee first
     employee_data = {
         "first_name": "Jane",
         "last_name": "Smith",
         "email": "jane.smith@example.com"
     }
-    client.post("/api/employees", json=employee_data)
+    client.post("/api/employees", json=employee_data, headers=headers)
     
     # Get employees list
-    response = client.get("/api/employees")
+    response = client.get("/api/employees", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -126,17 +169,20 @@ def test_get_employees():
 
 def test_get_employee_by_id():
     """Test getting employee by ID"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Create an employee
     employee_data = {
         "first_name": "Bob",
         "last_name": "Johnson",
         "email": "bob@example.com"
     }
-    create_response = client.post("/api/employees", json=employee_data)
+    create_response = client.post("/api/employees", json=employee_data, headers=headers)
     employee_id = create_response.json()["id"]
     
     # Get employee by ID
-    response = client.get(f"/api/employees/{employee_id}")
+    response = client.get(f"/api/employees/{employee_id}", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["first_name"] == "Bob"
@@ -144,13 +190,16 @@ def test_get_employee_by_id():
 
 def test_update_employee():
     """Test updating an employee"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Create an employee
     employee_data = {
         "first_name": "Alice",
         "last_name": "Williams",
         "email": "alice@example.com"
     }
-    create_response = client.post("/api/employees", json=employee_data)
+    create_response = client.post("/api/employees", json=employee_data, headers=headers)
     employee_id = create_response.json()["id"]
     
     # Update employee
@@ -159,7 +208,7 @@ def test_update_employee():
         "last_name": "Smith",
         "email": "alice.smith@example.com"
     }
-    response = client.put(f"/api/employees/{employee_id}", json=update_data)
+    response = client.put(f"/api/employees/{employee_id}", json=update_data, headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["last_name"] == "Smith"
@@ -167,32 +216,38 @@ def test_update_employee():
 
 def test_delete_employee():
     """Test deleting an employee"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Create an employee
     employee_data = {
         "first_name": "Charlie",
         "last_name": "Brown",
         "email": "charlie@example.com"
     }
-    create_response = client.post("/api/employees", json=employee_data)
+    create_response = client.post("/api/employees", json=employee_data, headers=headers)
     employee_id = create_response.json()["id"]
     
     # Delete employee
-    response = client.delete(f"/api/employees/{employee_id}")
+    response = client.delete(f"/api/employees/{employee_id}", headers=headers)
     assert response.status_code == 204
     
     # Verify employee is deleted
-    get_response = client.get(f"/api/employees/{employee_id}")
+    get_response = client.get(f"/api/employees/{employee_id}", headers=headers)
     assert get_response.status_code == 404
 
 def test_create_work_log():
     """Test creating a work log"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Create an employee first
     employee_data = {
         "first_name": "David",
         "last_name": "Lee",
         "email": "david@example.com"
     }
-    employee_response = client.post("/api/employees", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data, headers=headers)
     employee_id = employee_response.json()["id"]
     
     # Create work log
@@ -206,7 +261,7 @@ def test_create_work_log():
         "other_hours": 0.0,
         "notes": "Test work log"
     }
-    response = client.post("/api/work-logs", json=work_log_data)
+    response = client.post("/api/work-logs", json=work_log_data, headers=headers)
     assert response.status_code == 201
     data = response.json()
     assert data["work_hours"] == "8.00"
@@ -214,13 +269,16 @@ def test_create_work_log():
 
 def test_work_log_validation_warning():
     """Test work log validation for hours > 12"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Create an employee
     employee_data = {
         "first_name": "Eve",
         "last_name": "Martinez",
         "email": "eve@example.com"
     }
-    employee_response = client.post("/api/employees", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data, headers=headers)
     employee_id = employee_response.json()["id"]
     
     # Create work log with > 12 hours
@@ -234,7 +292,7 @@ def test_work_log_validation_warning():
         "other_hours": 0.0,
         "notes": "Long day"
     }
-    response = client.post("/api/work-logs", json=work_log_data)
+    response = client.post("/api/work-logs", json=work_log_data, headers=headers)
     assert response.status_code == 201
     data = response.json()
     # Should have a warning
@@ -243,13 +301,16 @@ def test_work_log_validation_warning():
 
 def test_work_log_duplicate_date():
     """Test that duplicate work logs for same employee and date are rejected"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Create an employee
     employee_data = {
         "first_name": "Frank",
         "last_name": "Garcia",
         "email": "frank@example.com"
     }
-    employee_response = client.post("/api/employees", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data, headers=headers)
     employee_id = employee_response.json()["id"]
     
     # Create first work log
@@ -262,23 +323,26 @@ def test_work_log_duplicate_date():
         "sick_leave_hours": 0.0,
         "other_hours": 0.0
     }
-    response1 = client.post("/api/work-logs", json=work_log_data)
+    response1 = client.post("/api/work-logs", json=work_log_data, headers=headers)
     assert response1.status_code == 201
     
     # Try to create duplicate
-    response2 = client.post("/api/work-logs", json=work_log_data)
+    response2 = client.post("/api/work-logs", json=work_log_data, headers=headers)
     assert response2.status_code == 400
     assert "already exists" in response2.json()["detail"]
 
 def test_get_work_logs_with_filters():
     """Test getting work logs with filters"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Create an employee
     employee_data = {
         "first_name": "Grace",
         "last_name": "Taylor",
         "email": "grace@example.com"
     }
-    employee_response = client.post("/api/employees", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data, headers=headers)
     employee_id = employee_response.json()["id"]
     
     # Create work logs
@@ -292,18 +356,21 @@ def test_get_work_logs_with_filters():
             "sick_leave_hours": 0.0,
             "other_hours": 0.0
         }
-        client.post("/api/work-logs", json=work_log_data)
+        client.post("/api/work-logs", json=work_log_data, headers=headers)
     
     # Get work logs filtered by employee
-    response = client.get(f"/api/work-logs?employee_id={employee_id}")
+    response = client.get(f"/api/work-logs?employee_id={employee_id}", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 3
 
 def test_get_work_logs_summary():
     """Test getting summary of all work logs"""
+    _create_admin()
+    token = _get_token()
+    headers = _auth_headers(token)
     # Test empty summary
-    response = client.get("/api/work-logs/summary")
+    response = client.get("/api/work-logs/summary", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["total_work_hours"] == 0
@@ -320,7 +387,7 @@ def test_get_work_logs_summary():
         "last_name": "User",
         "email": "test@example.com"
     }
-    employee_response = client.post("/api/employees", json=employee_data)
+    employee_response = client.post("/api/employees", json=employee_data, headers=headers)
     employee_id = employee_response.json()["id"]
     
     # Create multiple work logs with different hour types
@@ -368,10 +435,10 @@ def test_get_work_logs_summary():
     ]
     
     for log_data in work_logs_data:
-        client.post("/api/work-logs", json=log_data)
+        client.post("/api/work-logs", json=log_data, headers=headers)
     
     # Get summary
-    response = client.get("/api/work-logs/summary")
+    response = client.get("/api/work-logs/summary", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert data["total_work_hours"] == 14.0

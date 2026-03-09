@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from typing import Optional, Literal
 from datetime import date
 from app.database import get_db
-from app.models import WorkLog, Employee
+from app.models import WorkLog, Employee, User
+from app.middleware.auth import get_current_user
 from app.services.pdf_generator import generate_manager_report_pdf, generate_owner_report_pdf
 
 router = APIRouter()
@@ -15,7 +16,8 @@ def get_manager_report(
     start_date: date,
     end_date: date,
     format: Literal["json", "pdf"] = "json",
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Generate manager report (hours only, no financial data)
@@ -103,7 +105,8 @@ def get_owner_report(
     format: Literal["json", "pdf"] = "json",
     hourly_rate: float = 25.0,
     overtime_multiplier: float = 1.5,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Generate owner report (includes financial data with rates and costs)

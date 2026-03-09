@@ -1,4 +1,5 @@
 // API Configuration
-const API_URL = process.env.REACT_APP_API_URL || '/api';
+const BASE_URL = process.env.REACT_APP_API_URL || '';
+const API_URL = `${BASE_URL}/api`;
 
 export default API_URL;
