@@ -111,9 +111,9 @@ def test_get_me_with_valid_token():
 
 
 def test_get_me_without_token():
-    """Test /me without token returns 403."""
+    """Test /me without token returns 401."""
     response = client.get("/api/auth/me")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 def test_get_me_with_invalid_token():
@@ -138,9 +138,9 @@ def test_logout_with_valid_token():
 
 
 def test_logout_without_token():
-    """Test logout without token returns 403."""
+    """Test logout without token returns 401."""
     response = client.post("/api/auth/logout")
-    assert response.status_code == 403
+    assert response.status_code == 401
 
 
 # --- Change password tests ---
@@ -198,9 +198,9 @@ def test_change_password_too_short():
 
 
 def test_change_password_without_token():
-    """Test change password without token returns 403."""
+    """Test change password without token returns 401."""
     response = client.post(
         "/api/auth/change-password",
         json={"currentPassword": "old", "newPassword": "newpass456"},
     )
-    assert response.status_code == 403
+    assert response.status_code == 401

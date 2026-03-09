@@ -93,7 +93,7 @@ class TestListUsers:
 
     def test_unauthenticated_cannot_list_users(self):
         resp = client.get("/api/users")
-        assert resp.status_code == 403
+        assert resp.status_code == 401
 
 
 class TestCreateUser:

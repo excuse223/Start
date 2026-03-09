@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Updated all backend dependencies to latest stable versions
+- Migrated JWT library from `python-jose` to `PyJWT` for better maintenance and active development
+- Backend Dockerfile now uses multi-stage build with non-root user for smaller, more secure images
+- `docker-compose.yml`: add `restart: unless-stopped` to all services; add healthchecks for backend and frontend
+- `backend/requirements.txt`: remove test-only packages (`pytest`, `pytest-asyncio`, `httpx`)
+- `frontend/README.md`: fix license section to reflect MIT License
+
+### Added
+- Frontend unit tests using React Testing Library (`App`, `Login`, `ProtectedRoute`)
+- `frontend/src/setupTests.js` with `@testing-library/jest-dom` configuration
+- Branch protection documentation (`.github/BRANCH_PROTECTION.md`)
+- Production SSL nginx configuration template (`frontend/nginx.ssl.conf`)
+- HSTS header (commented) in development `frontend/nginx.conf` for easy production enablement
+- `LICENSE` file (MIT License, copyright excuse223)
+- `.env.example` in repo root with placeholder values for docker-compose
+- `.github/workflows/ci.yml` — GitHub Actions CI with backend (pytest) and frontend (build + test) jobs
+- `backend/requirements-dev.txt` — separate dev/test dependencies
+- `CHANGELOG.md` — this file
+
 ### Security
 - Remove hardcoded `POSTGRES_PASSWORD` and `DATABASE_URL` secrets from `docker-compose.yml`; replaced with `${VARIABLE}` references loaded from a `.env` file
 - Stop exposing PostgreSQL (5432) and Redis (6379) ports to the host; services are now only accessible within the Docker network
@@ -14,18 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add security headers to `frontend/nginx.conf`: `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`, `Referrer-Policy`, `Content-Security-Policy`
 - Add `client_max_body_size 10m` to nginx to limit upload size
 - Add `frontend/.env.development` and `frontend/.env.production` to `.gitignore`
-
-### Added
-- `LICENSE` file (MIT License, copyright excuse223)
-- `.env.example` in repo root with placeholder values for docker-compose
-- `.github/workflows/ci.yml` — GitHub Actions CI with backend (pytest) and frontend (build + test) jobs
-- `backend/requirements-dev.txt` — separate dev/test dependencies
-- `CHANGELOG.md` — this file
-
-### Changed
-- `docker-compose.yml`: add `restart: unless-stopped` to all services; add healthchecks for backend and frontend
-- `backend/requirements.txt`: remove test-only packages (`pytest`, `pytest-asyncio`, `httpx`)
-- `frontend/README.md`: fix license section to reflect MIT License
 
 ## [1.0.0] - 2026-03-09
 
