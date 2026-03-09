@@ -1,13 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import './Settings.css';
 
-const TABS = ['General', 'Work Hours', 'Appearance', 'Security'];
-
 function Settings() {
   const { user } = useAuth();
+  const { t } = useTranslation();
+  const TABS = useMemo(() => [
+    { key: 'General', label: t('settings.tabGeneral') },
+    { key: 'Work Hours', label: t('settings.tabWorkHours') },
+    { key: 'Appearance', label: t('settings.tabAppearance') },
+    { key: 'Security', label: t('settings.tabSecurity') },
+  ], [t]);
   const [activeTab, setActiveTab] = useState('General');
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
@@ -28,7 +34,7 @@ function Settings() {
       resp.data.forEach(s => { map[s.key] = s.value || ''; });
       setSettings(map);
     } catch (err) {
-      setError('Failed to load settings.');
+      setError(t('settings.failedLoad'));
     } finally {
       setLoading(false);
     }
@@ -40,10 +46,10 @@ function Settings() {
     setSuccess(null);
     try {
       await axios.put(`${API_URL}/settings`, { settings });
-      setSuccess('Settings saved successfully!');
+      setSuccess(t('settings.savedSuccess'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to save settings.');
+      setError(err.response?.data?.detail || t('settings.failedSave'));
     } finally {
       setSaving(false);
     }
@@ -54,8 +60,8 @@ function Settings() {
   if (user?.role !== 'admin') {
     return (
       <div className="access-denied">
-        <h2>Access Denied</h2>
-        <p>You need admin role to view this page.</p>
+        <h2>{t('common.accessDenied')}</h2>
+        <p>{t('common.accessDeniedAdmin')}</p>
       </div>
     );
   }
@@ -63,9 +69,9 @@ function Settings() {
   return (
     <div className="settings-page">
       <div className="settings-header">
-        <h1>⚙️ Settings</h1>
+        <h1>⚙️ {t('settings.title')}</h1>
         <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving...' : '💾 Save Settings'}
+          {saving ? t('settings.savingSettings') : t('settings.saveSettings')}
         </button>
       </div>
 
@@ -76,11 +82,11 @@ function Settings() {
         <div className="settings-tabs">
           {TABS.map(tab => (
             <button
-              key={tab}
-              className={`tab-btn${activeTab === tab ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab)}
+              key={tab.key}
+              className={`tab-btn${activeTab === tab.key ? ' active' : ''}`}
+              onClick={() => setActiveTab(tab.key)}
             >
-              {tab}
+              {tab.label}
             </button>
           ))}
         </div>
@@ -91,18 +97,18 @@ function Settings() {
           <div className="settings-content card">
             {activeTab === 'General' && (
               <div className="settings-section">
-                <h2>General Settings</h2>
+                <h2>{t('settings.generalTitle')}</h2>
                 <div className="form-group">
-                  <label>Company Name</label>
+                  <label>{t('settings.companyName')}</label>
                   <input
                     type="text"
                     value={settings.company_name || ''}
                     onChange={e => set('company_name', e.target.value)}
-                    placeholder="Your Company Name"
+                    placeholder={t('settings.companyNamePlaceholder')}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Company Logo URL</label>
+                  <label>{t('settings.companyLogoUrl')}</label>
                   <input
                     type="url"
                     value={settings.company_logo_url || ''}
@@ -111,7 +117,7 @@ function Settings() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Currency</label>
+                  <label>{t('settings.currency')}</label>
                   <select value={settings.currency || 'USD'} onChange={e => set('currency', e.target.value)}>
                     <option value="USD">USD ($)</option>
                     <option value="EUR">EUR (€)</option>
@@ -120,7 +126,7 @@ function Settings() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Timezone</label>
+                  <label>{t('settings.timezone')}</label>
                   <select value={settings.timezone || 'UTC'} onChange={e => set('timezone', e.target.value)}>
                     <option value="UTC">UTC</option>
                     <option value="America/New_York">America/New_York</option>
@@ -133,7 +139,7 @@ function Settings() {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Date Format</label>
+                  <label>{t('settings.dateFormat')}</label>
                   <select value={settings.date_format || 'DD/MM/YYYY'} onChange={e => set('date_format', e.target.value)}>
                     <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                     <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -145,9 +151,9 @@ function Settings() {
 
             {activeTab === 'Work Hours' && (
               <div className="settings-section">
-                <h2>Work Hours Configuration</h2>
+                <h2>{t('settings.workHoursTitle')}</h2>
                 <div className="form-group">
-                  <label>Default Work Hours per Day</label>
+                  <label>{t('settings.defaultWorkHours')}</label>
                   <input
                     type="number"
                     min="1"
@@ -157,7 +163,7 @@ function Settings() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Overtime Threshold (hours/day)</label>
+                  <label>{t('settings.overtimeThreshold')}</label>
                   <input
                     type="number"
                     min="1"
@@ -165,26 +171,26 @@ function Settings() {
                     value={settings.overtime_threshold || '8'}
                     onChange={e => set('overtime_threshold', e.target.value)}
                   />
-                  <small>Hours worked beyond this value count as overtime.</small>
+                  <small>{t('settings.overtimeThresholdNote')}</small>
                 </div>
               </div>
             )}
 
             {activeTab === 'Appearance' && (
               <div className="settings-section">
-                <h2>Appearance</h2>
-                <p className="settings-note">💡 Use the 🌙/☀️ button in the sidebar to toggle dark/light mode.</p>
+                <h2>{t('settings.appearanceTitle')}</h2>
+                <p className="settings-note">{t('settings.appearanceNote1')}</p>
                 <p className="settings-note" style={{ marginTop: '0.75rem' }}>
-                  Date format and currency can be configured in the <strong>General</strong> tab.
+                  {t('settings.appearanceNote2')} <strong>{t('settings.tabGeneral')}</strong>.
                 </p>
               </div>
             )}
 
             {activeTab === 'Security' && (
               <div className="settings-section">
-                <h2>Security Settings</h2>
+                <h2>{t('settings.securityTitle')}</h2>
                 <div className="form-group">
-                  <label>Session Timeout (minutes)</label>
+                  <label>{t('settings.sessionTimeout')}</label>
                   <input
                     type="number"
                     min="5"
@@ -192,10 +198,10 @@ function Settings() {
                     value={settings.session_timeout_minutes || '60'}
                     onChange={e => set('session_timeout_minutes', e.target.value)}
                   />
-                  <small>Users will be logged out after this many minutes of inactivity.</small>
+                  <small>{t('settings.sessionTimeoutNote')}</small>
                 </div>
                 <div className="form-group">
-                  <label>Minimum Password Length</label>
+                  <label>{t('settings.minPasswordLength')}</label>
                   <input
                     type="number"
                     min="8"

@@ -1,8 +1,10 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function ProtectedRoute({ children, requiredRole }) {
   const { user, loading } = useAuth();
+  const { t } = useTranslation();
   const location = useLocation();
 
   if (loading) {
@@ -15,7 +17,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
         fontSize: '18px',
         color: '#666'
       }}>
-        Loading...
+        {t('common.loading')}
       </div>
     );
   }
@@ -36,9 +38,9 @@ export default function ProtectedRoute({ children, requiredRole }) {
         height: '100vh',
         gap: '16px'
       }}>
-        <h2>Access Denied</h2>
-        <p>You don't have permission to access this page.</p>
-        <p>Required role: {requiredRole}</p>
+        <h2>{t('common.accessDenied')}</h2>
+        <p>{t('common.accessDeniedRole')}</p>
+        <p>{t('common.accessDeniedRequired', { role: requiredRole })}</p>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import './Backups.css';
 
@@ -13,6 +14,7 @@ function formatSize(bytes) {
 
 function Backups() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [backups, setBackups] = useState([]);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ function Backups() {
       const resp = await axios.get(`${API_URL}/backups`);
       setBackups(resp.data);
     } catch (err) {
-      setError('Failed to load backups.');
+      setError(t('backups.failedLoad'));
     } finally {
       setLoading(false);
     }
@@ -55,29 +57,29 @@ function Backups() {
       await fetchBackups();
       await fetchStatus();
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to create backup.');
+      setError(err.response?.data?.detail || t('backups.failedCreate'));
     } finally {
       setCreating(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this backup? This cannot be undone.')) return;
+    if (!window.confirm(t('backups.deleteConfirm'))) return;
     try {
       await axios.delete(`${API_URL}/backups/${id}`);
       fetchBackups();
     } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to delete backup.');
+      alert(err.response?.data?.detail || t('backups.failedDelete'));
     }
   };
 
   const handleRestore = async (id) => {
     try {
       await axios.post(`${API_URL}/backups/${id}/restore`);
-      alert('Restore initiated successfully.');
+      alert(t('backups.restoreInitiated'));
       setRestoreId(null);
     } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to restore backup.');
+      alert(err.response?.data?.detail || t('backups.failedRestore'));
       setRestoreId(null);
     }
   };
@@ -85,8 +87,8 @@ function Backups() {
   if (user?.role !== 'admin') {
     return (
       <div className="access-denied">
-        <h2>Access Denied</h2>
-        <p>You need admin role to view this page.</p>
+        <h2>{t('common.accessDenied')}</h2>
+        <p>{t('common.accessDeniedAdmin')}</p>
       </div>
     );
   }
@@ -94,9 +96,9 @@ function Backups() {
   return (
     <div className="backups-page">
       <div className="backups-header">
-        <h1>💾 Backups</h1>
+        <h1>💾 {t('backups.title')}</h1>
         <button className="btn btn-primary" onClick={handleCreateBackup} disabled={creating}>
-          {creating ? '⏳ Creating...' : '+ Create Backup Now'}
+          {creating ? t('backups.creating') : t('backups.createBackup')}
         </button>
       </div>
 
@@ -105,23 +107,23 @@ function Backups() {
           <div className="status-card">
             <div className="status-card-icon">🕐</div>
             <div>
-              <div className="status-card-label">Last Backup</div>
+              <div className="status-card-label">{t('backups.lastBackup')}</div>
               <div className="status-card-value">
-                {status.last_backup ? new Date(status.last_backup).toLocaleString() : 'Never'}
+                {status.last_backup ? new Date(status.last_backup).toLocaleString() : t('common.never')}
               </div>
             </div>
           </div>
           <div className="status-card">
             <div className="status-card-icon">📅</div>
             <div>
-              <div className="status-card-label">Next Scheduled</div>
+              <div className="status-card-label">{t('backups.nextScheduled')}</div>
               <div className="status-card-value">{status.next_scheduled}</div>
             </div>
           </div>
           <div className="status-card">
             <div className="status-card-icon">📦</div>
             <div>
-              <div className="status-card-label">Total Backups</div>
+              <div className="status-card-label">{t('backups.totalBackups')}</div>
               <div className="status-card-value">{status.total_backups}</div>
             </div>
           </div>
@@ -138,18 +140,18 @@ function Backups() {
             <table>
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Filename</th>
-                  <th>Size</th>
-                  <th>Type</th>
-                  <th>Location</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>{t('backups.columnDate')}</th>
+                  <th>{t('backups.columnFilename')}</th>
+                  <th>{t('backups.columnSize')}</th>
+                  <th>{t('backups.columnType')}</th>
+                  <th>{t('backups.columnLocation')}</th>
+                  <th>{t('backups.columnStatus')}</th>
+                  <th>{t('backups.columnActions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {backups.length === 0 ? (
-                  <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>No backups found. Create one now!</td></tr>
+                  <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>{t('backups.noBackups')}</td></tr>
                 ) : backups.map(b => (
                   <tr key={b.id}>
                     <td>{new Date(b.created_at).toLocaleString()}</td>
@@ -166,11 +168,11 @@ function Backups() {
                       <div className="btn-group">
                         {b.status === 'completed' && (
                           <button className="btn btn-secondary btn-sm" onClick={() => setRestoreId(b.id)}>
-                            Restore
+                            {t('backups.restore')}
                           </button>
                         )}
                         <button className="btn btn-danger btn-sm" onClick={() => handleDelete(b.id)}>
-                          Delete
+                          {t('common.delete')}
                         </button>
                       </div>
                     </td>
@@ -186,12 +188,12 @@ function Backups() {
       {restoreId && (
         <div className="modal-overlay" onClick={() => setRestoreId(null)}>
           <div className="restore-modal" onClick={e => e.stopPropagation()}>
-            <h2>⚠️ Confirm Restore</h2>
-            <p>This will restore the database from the selected backup. This action may overwrite current data.</p>
-            <p><strong>Are you sure you want to proceed?</strong></p>
+            <h2>{t('backups.confirmRestoreTitle')}</h2>
+            <p>{t('backups.confirmRestoreBody')}</p>
+            <p><strong>{t('backups.confirmRestoreQuestion')}</strong></p>
             <div className="btn-group">
-              <button className="btn btn-secondary" onClick={() => setRestoreId(null)}>Cancel</button>
-              <button className="btn btn-danger" onClick={() => handleRestore(restoreId)}>Yes, Restore</button>
+              <button className="btn btn-secondary" onClick={() => setRestoreId(null)}>{t('common.cancel')}</button>
+              <button className="btn btn-danger" onClick={() => handleRestore(restoreId)}>{t('backups.yesRestore')}</button>
             </div>
           </div>
         </div>

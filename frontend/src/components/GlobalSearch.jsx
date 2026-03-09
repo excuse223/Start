@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import './GlobalSearch.css';
 
 function GlobalSearch() {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(null);
   const [open, setOpen] = useState(false);
@@ -80,7 +82,7 @@ function GlobalSearch() {
       <button
         className="search-trigger"
         onClick={() => { setOpen(true); setTimeout(() => inputRef.current?.focus(), 50); }}
-        title="Search (Ctrl+K)"
+        title={t('common.search') + ' (Ctrl+K)'}
       >
         🔍 <span className="search-hint">Ctrl+K</span>
       </button>
@@ -95,24 +97,24 @@ function GlobalSearch() {
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="Search employees, projects, users..."
+                placeholder={t('globalSearch.placeholder')}
                 className="search-input"
                 autoFocus
               />
               {query && <button className="search-clear" onClick={() => { setQuery(''); setResults(null); }}>✕</button>}
             </div>
 
-            {loading && <div className="search-loading">Searching...</div>}
+            {loading && <div className="search-loading">{t('globalSearch.searching')}</div>}
 
             {results && allResults.length === 0 && !loading && (
-              <div className="search-empty">No results found for "{query}"</div>
+              <div className="search-empty">{t('globalSearch.noResults', { query })}</div>
             )}
 
             {results && allResults.length > 0 && (
               <div className="search-results">
                 {results.employees?.length > 0 && (
                   <div className="result-group">
-                    <div className="result-group-title">👥 Employees</div>
+                    <div className="result-group-title">{t('globalSearch.employees')}</div>
                     {results.employees.map(item => (
                       <div key={item.id} className="result-item" onClick={() => handleSelect(item)}>
                         <span className="result-title">{item.title}</span>
@@ -123,7 +125,7 @@ function GlobalSearch() {
                 )}
                 {results.projects?.length > 0 && (
                   <div className="result-group">
-                    <div className="result-group-title">📁 Projects</div>
+                    <div className="result-group-title">{t('globalSearch.projects')}</div>
                     {results.projects.map(item => (
                       <div key={item.id} className="result-item" onClick={() => handleSelect(item)}>
                         <span className="result-title">{item.title}</span>
@@ -134,7 +136,7 @@ function GlobalSearch() {
                 )}
                 {results.users?.length > 0 && (
                   <div className="result-group">
-                    <div className="result-group-title">👤 Users</div>
+                    <div className="result-group-title">{t('globalSearch.usersGroup')}</div>
                     {results.users.map(item => (
                       <div key={item.id} className="result-item" onClick={() => handleSelect(item)}>
                         <span className="result-title">{item.title}</span>
@@ -147,7 +149,7 @@ function GlobalSearch() {
             )}
 
             <div className="search-footer">
-              Press <kbd>ESC</kbd> to close · <kbd>↵</kbd> to navigate
+              <kbd>ESC</kbd> {t('globalSearch.footerClose')} · <kbd>↵</kbd> {t('globalSearch.footerNavigate')}
             </div>
           </div>
         </div>

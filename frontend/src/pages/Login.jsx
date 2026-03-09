@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import './Login.css';
 
 export default function Login() {
@@ -8,6 +9,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,13 +22,13 @@ export default function Login() {
     } catch (err) {
       console.error('Login error:', err);
       if (err.response?.status === 429) {
-        setError('Too many login attempts. Please try again later.');
+        setError(t('login.error429'));
       } else if (err.response?.status === 401) {
-        setError('Invalid username or password');
+        setError(t('login.error401'));
       } else if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else {
-        setError('Login failed. Please try again.');
+        setError(t('login.errorGeneral'));
       }
     } finally {
       setLoading(false);
@@ -37,17 +39,17 @@ export default function Login() {
     <div className="login-page">
       <div className="login-container">
         <div className="login-header">
-          <h1>⏰ Work Hours Tracker</h1>
-          <p>Sign in to manage work hours and reports</p>
+          <h1>⏰ {t('login.title')}</h1>
+          <p>{t('login.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">{t('login.usernameLabel')}</label>
             <input
               id="username"
               type="text"
-              placeholder="Enter your username"
+              placeholder={t('login.usernamePlaceholder')}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -57,11 +59,11 @@ export default function Login() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t('login.passwordLabel')}</label>
             <input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder={t('login.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -80,14 +82,14 @@ export default function Login() {
             className="login-button"
             disabled={loading || !username || !password}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? t('login.signingIn') : t('login.signIn')}
           </button>
         </form>
 
         <div className="login-footer">
           {process.env.NODE_ENV === 'development' && (
             <>
-              <p>Default credentials for testing:</p>
+              <p>{t('login.devCredentials')}</p>
               <code>admin / admin123</code>
             </>
           )}

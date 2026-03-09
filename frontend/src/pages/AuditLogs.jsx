@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import './AuditLogs.css';
 
 function AuditLogs() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +30,7 @@ function AuditLogs() {
       const resp = await axios.get(`${API_URL}/audit`, { params });
       setLogs(resp.data);
     } catch (err) {
-      setError('Failed to load audit logs.');
+      setError(t('auditLogs.failedLoad'));
     } finally {
       setLoading(false);
     }
@@ -39,11 +41,21 @@ function AuditLogs() {
     return map[action] || '📝';
   };
 
+  const actionLabel = (action) => {
+    const map = {
+      created: t('auditLogs.actionCreated'),
+      updated: t('auditLogs.actionUpdated'),
+      deleted: t('auditLogs.actionDeleted'),
+      logged_in: t('auditLogs.actionLoggedIn'),
+    };
+    return map[action] || action;
+  };
+
   if (user?.role !== 'admin') {
     return (
       <div className="access-denied">
-        <h2>Access Denied</h2>
-        <p>You need admin role to view this page.</p>
+        <h2>{t('common.accessDenied')}</h2>
+        <p>{t('common.accessDeniedAdmin')}</p>
       </div>
     );
   }
@@ -51,25 +63,25 @@ function AuditLogs() {
   return (
     <div className="audit-page">
       <div className="audit-header">
-        <h1>📋 Audit Logs</h1>
+        <h1>📋 {t('auditLogs.title')}</h1>
       </div>
 
       <div className="audit-filters">
         <select value={actionFilter} onChange={e => setActionFilter(e.target.value)} className="filter-select">
-          <option value="">All Actions</option>
-          <option value="created">Created</option>
-          <option value="updated">Updated</option>
-          <option value="deleted">Deleted</option>
-          <option value="logged_in">Logged In</option>
+          <option value="">{t('auditLogs.allActions')}</option>
+          <option value="created">{t('auditLogs.actionCreated')}</option>
+          <option value="updated">{t('auditLogs.actionUpdated')}</option>
+          <option value="deleted">{t('auditLogs.actionDeleted')}</option>
+          <option value="logged_in">{t('auditLogs.actionLoggedIn')}</option>
         </select>
         <select value={entityFilter} onChange={e => setEntityFilter(e.target.value)} className="filter-select">
-          <option value="">All Entities</option>
-          <option value="employee">Employee</option>
-          <option value="work_log">Work Log</option>
-          <option value="project">Project</option>
-          <option value="user">User</option>
+          <option value="">{t('auditLogs.allEntities')}</option>
+          <option value="employee">{t('auditLogs.entityEmployee')}</option>
+          <option value="work_log">{t('auditLogs.entityWorkLog')}</option>
+          <option value="project">{t('auditLogs.entityProject')}</option>
+          <option value="user">{t('auditLogs.entityUser')}</option>
         </select>
-        <button className="btn btn-secondary" onClick={fetchLogs}>🔄 Refresh</button>
+        <button className="btn btn-secondary" onClick={fetchLogs}>🔄 {t('common.refresh')}</button>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -82,18 +94,18 @@ function AuditLogs() {
             <table>
               <thead>
                 <tr>
-                  <th>Time</th>
-                  <th>User</th>
-                  <th>Action</th>
-                  <th>Entity</th>
-                  <th>ID</th>
-                  <th>IP</th>
-                  <th>Changes</th>
+                  <th>{t('auditLogs.columnTime')}</th>
+                  <th>{t('auditLogs.columnUser')}</th>
+                  <th>{t('auditLogs.columnAction')}</th>
+                  <th>{t('auditLogs.columnEntity')}</th>
+                  <th>{t('auditLogs.columnId')}</th>
+                  <th>{t('auditLogs.columnIp')}</th>
+                  <th>{t('auditLogs.columnChanges')}</th>
                 </tr>
               </thead>
               <tbody>
                 {logs.length === 0 ? (
-                  <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>No audit logs found.</td></tr>
+                  <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>{t('auditLogs.noLogs')}</td></tr>
                 ) : logs.map(log => (
                   <React.Fragment key={log.id}>
                     <tr>
@@ -101,7 +113,7 @@ function AuditLogs() {
                       <td>{log.user_id || '-'}</td>
                       <td>
                         <span className={`action-badge action-${log.action}`}>
-                          {actionIcon(log.action)} {log.action}
+                          {actionIcon(log.action)} {actionLabel(log.action)}
                         </span>
                       </td>
                       <td>{log.entity_type}</td>
@@ -113,7 +125,7 @@ function AuditLogs() {
                             className="btn btn-secondary btn-sm"
                             onClick={() => setExpanded(expanded === log.id ? null : log.id)}
                           >
-                            {expanded === log.id ? 'Hide' : 'Show'}
+                            {expanded === log.id ? t('auditLogs.hide') : t('auditLogs.show')}
                           </button>
                         )}
                       </td>
@@ -124,13 +136,13 @@ function AuditLogs() {
                           <div className="changes-detail">
                             {log.old_values && (
                               <div className="changes-old">
-                                <strong>Before:</strong>
+                                <strong>{t('auditLogs.before')}</strong>
                                 <pre>{log.old_values}</pre>
                               </div>
                             )}
                             {log.new_values && (
                               <div className="changes-new">
-                                <strong>After:</strong>
+                                <strong>{t('auditLogs.after')}</strong>
                                 <pre>{log.new_values}</pre>
                               </div>
                             )}
