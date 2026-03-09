@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import Login from '../pages/Login';
 
@@ -9,10 +10,10 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
-// Mock AuthContext
+const mockLogin = jest.fn();
 jest.mock('../contexts/AuthContext', () => ({
   useAuth: () => ({
-    login: jest.fn(),
+    login: mockLogin,
   }),
 }));
 
@@ -37,4 +38,19 @@ test('renders password input', () => {
 test('renders submit button', () => {
   renderLogin();
   expect(screen.getByRole('button', { name: 'login.signIn' })).toBeInTheDocument();
+});
+
+test('submit button is disabled when fields are empty', () => {
+  renderLogin();
+  expect(screen.getByRole('button', { name: 'login.signIn' })).toBeDisabled();
+});
+
+test('calls login with username and password on submit', async () => {
+  mockLogin.mockResolvedValueOnce(undefined);
+  renderLogin();
+  const user = userEvent.setup();
+  await user.type(screen.getByLabelText('login.usernameLabel'), 'admin');
+  await user.type(screen.getByLabelText('login.passwordLabel'), 'password');
+  await user.click(screen.getByRole('button', { name: 'login.signIn' }));
+  expect(mockLogin).toHaveBeenCalledWith('admin', 'password');
 });
