@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
+import ForcePasswordChange from './pages/ForcePasswordChange';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import EmployeeList from './components/EmployeeList';
@@ -40,6 +41,7 @@ function App() {
           <Routes>
             {/* Public route */}
             <Route path="/login" element={<Login />} />
+            <Route path="/force-password-change" element={<ForcePasswordChange />} />
 
             {/* Protected routes using layout */}
             <Route element={<ProtectedLayout />}>

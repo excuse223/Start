@@ -31,6 +31,7 @@ class UserResponse(BaseModel):
     role: str
     employee_id: Optional[int]
     created_at: datetime
+    force_password_change: bool = False
 
     class Config:
         from_attributes = True
@@ -141,6 +142,7 @@ def change_password(
         )
 
     current_user.password_hash = pwd_context.hash(request.newPassword)
+    current_user.force_password_change = False
     db.commit()
     security_logger.info("Password changed: username=%s", current_user.username)
     return {"message": "Password changed successfully"}

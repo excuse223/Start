@@ -70,6 +70,23 @@
     "devCredentials": "Default credentials for testing:",
     "workHours": "Work Hours"
   },
+  "forcePasswordChange": {
+    "title": "Change Password",
+    "subtitle": "You must change your password before continuing",
+    "currentLabel": "Current Password",
+    "currentPlaceholder": "Enter your current password",
+    "newLabel": "New Password",
+    "newPlaceholder": "Enter your new password",
+    "confirmLabel": "Confirm New Password",
+    "confirmPlaceholder": "Confirm your new password",
+    "changeButton": "Change Password",
+    "changing": "Changing...",
+    "mismatch": "New passwords do not match",
+    "tooShort": "Password must be at least 6 characters",
+    "wrongCurrent": "Current password is incorrect",
+    "errorGeneral": "Failed to change password. Please try again.",
+    "logoutInstead": "Log out instead"
+  },
   "dashboard": {
     "title": "Dashboard",
     "totalHours": "Total Hours",

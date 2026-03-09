@@ -17,6 +17,7 @@ const API_URL = process.env.REACT_APP_API_URL || '';
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [forcePasswordChange, setForcePasswordChange] = useState(false);
   const navigate = useNavigate();
 
   // Setup axios interceptor to add token to all requests
@@ -42,6 +43,7 @@ export function AuthProvider({ children }) {
           // Token expired or invalid
           localStorage.removeItem('token');
           setUser(null);
+          setForcePasswordChange(false);
           navigate('/login');
         }
         return Promise.reject(error);
@@ -69,6 +71,9 @@ export function AuthProvider({ children }) {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data);
+        if (response.data.force_password_change) {
+          setForcePasswordChange(true);
+        }
       } catch (error) {
         console.error('Token verification failed:', error);
         localStorage.removeItem('token');
@@ -91,6 +96,20 @@ export function AuthProvider({ children }) {
 
     localStorage.setItem('token', token);
     setUser(userData);
+
+    if (userData.force_password_change) {
+      setForcePasswordChange(true);
+      navigate('/force-password-change');
+    } else {
+      navigate('/');
+    }
+  };
+
+  const clearForcePasswordChange = () => {
+    setForcePasswordChange(false);
+    if (user) {
+      setUser({ ...user, force_password_change: false });
+    }
     navigate('/');
   };
 
@@ -107,6 +126,7 @@ export function AuthProvider({ children }) {
     } finally {
       localStorage.removeItem('token');
       setUser(null);
+      setForcePasswordChange(false);
       navigate('/login');
     }
   };
@@ -116,6 +136,8 @@ export function AuthProvider({ children }) {
     login,
     logout,
     loading,
+    forcePasswordChange,
+    clearForcePasswordChange,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
     isManager: user?.role === 'manager',

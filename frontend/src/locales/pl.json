@@ -70,6 +70,23 @@
     "devCredentials": "Domyślne dane do testów:",
     "workHours": "Ewidencja Czasu Pracy"
   },
+  "forcePasswordChange": {
+    "title": "Zmień hasło",
+    "subtitle": "Musisz zmienić hasło przed kontynuowaniem",
+    "currentLabel": "Aktualne hasło",
+    "currentPlaceholder": "Wpisz aktualne hasło",
+    "newLabel": "Nowe hasło",
+    "newPlaceholder": "Wpisz nowe hasło",
+    "confirmLabel": "Potwierdź nowe hasło",
+    "confirmPlaceholder": "Wpisz ponownie nowe hasło",
+    "changeButton": "Zmień hasło",
+    "changing": "Zmienianie...",
+    "mismatch": "Nowe hasła nie są zgodne",
+    "tooShort": "Hasło musi mieć co najmniej 6 znaków",
+    "wrongCurrent": "Aktualne hasło jest nieprawidłowe",
+    "errorGeneral": "Nie udało się zmienić hasła. Spróbuj ponownie.",
+    "logoutInstead": "Wyloguj się"
+  },
   "dashboard": {
     "title": "Pulpit",
     "totalHours": "Suma Godzin",
