@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { BASE_URL } from '../config';
 
 const AuthContext = createContext();
 
@@ -12,7 +13,7 @@ export const useAuth = () => {
   return context;
 };
 
-const API_URL = process.env.REACT_APP_API_URL || '';
+const API_URL = BASE_URL;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
