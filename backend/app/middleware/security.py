@@ -7,6 +7,27 @@ from starlette.responses import RedirectResponse, Response
 
 security_logger = logging.getLogger("security")
 
+
+def _build_csp() -> str:
+    """Build the Content-Security-Policy header, expanding connect-src for Codespaces."""
+    connect_src = "'self'"
+    codespace_name = os.getenv("CODESPACE_NAME")
+    if codespace_name:
+        domain = os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "app.github.dev")
+        connect_src += (
+            f" https://{codespace_name}-8000.{domain}"
+            f" https://{codespace_name}-3000.{domain}"
+        )
+    return (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; "
+        "font-src 'self'; "
+        f"connect-src {connect_src}"
+    )
+
+
 # Security headers equivalent to helmet.js defaults
 _SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
@@ -15,14 +36,7 @@ _SECURITY_HEADERS = {
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
-    "Content-Security-Policy": (
-        "default-src 'self'; "
-        "script-src 'self'; "
-        "style-src 'self' 'unsafe-inline'; "
-        "img-src 'self' data:; "
-        "font-src 'self'; "
-        "connect-src 'self'"
-    ),
+    "Content-Security-Policy": _build_csp(),
     "Cache-Control": "no-store",
     "Pragma": "no-cache",
 }
@@ -33,6 +47,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next) -> Response:
         response = await call_next(request)
+        # Skip restrictive security headers (especially CSP) for CORS preflight requests
+        # so the browser does not reject the preflight before checking CORS headers.
+        if request.method == "OPTIONS":
+            return response
         for header, value in _SECURITY_HEADERS.items():
             response.headers[header] = value
         return response

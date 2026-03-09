@@ -42,9 +42,9 @@ app = FastAPI(
     version="1.0.1"
 )
 
-# --- Middleware (order matters: first added = outermost wrapper) ---
+# --- Middleware (order matters: last added = outermost wrapper, runs first on request) ---
 
-# Security headers (helmet.js equivalent) — must be first so every response gets headers
+# Inner middleware — added first, run last on request / first on response
 app.add_middleware(SecurityHeadersMiddleware)
 
 # HTTPS enforcement
@@ -57,7 +57,8 @@ app.add_middleware(SecurityLoggingMiddleware)
 # GZip compression
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# CORS — use whitelist from environment in production
+# CORS — outermost, added last so CORS headers are applied before any other middleware
+# can override them (last added = outermost in Starlette's middleware stack).
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_allowed_origins(),
