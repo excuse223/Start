@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from jose import jwt
+import jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from typing import Optional

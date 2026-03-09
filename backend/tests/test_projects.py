@@ -65,7 +65,7 @@ def _auth_headers(token):
 
 def test_list_projects_requires_auth():
     resp = client.get("/api/projects")
-    assert resp.status_code == 403
+    assert resp.status_code == 401
 
 
 def test_create_and_list_projects():
