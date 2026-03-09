@@ -164,6 +164,25 @@ class TestCreateUser:
         assert resp.status_code == 201
         assert resp.json()["employee_id"] == emp.id
 
+    def test_create_user_duplicate_employee_link(self):
+        _create_user("admin1", "Admin123!", "admin")
+        emp = _create_employee("Jan", "Kowalski", "jan@example.com")
+        token = _get_token("admin1", "Admin123!")
+        # Link the employee to the first user
+        client.post(
+            "/api/users",
+            headers=_auth(token),
+            json={"username": "jkowalski", "password": "ValidPass1!", "role": "manager", "employee_id": emp.id},
+        )
+        # Try to link same employee to a second user
+        resp = client.post(
+            "/api/users",
+            headers=_auth(token),
+            json={"username": "jkowalski2", "password": "ValidPass1!", "role": "employee", "employee_id": emp.id},
+        )
+        assert resp.status_code == 400
+        assert "already linked" in resp.json()["detail"]
+
 
 class TestUpdateUser:
     def test_update_user_role(self):
@@ -193,6 +212,20 @@ class TestUpdateUser:
         token = _get_token("admin1", "Admin123!")
         resp = client.put("/api/users/9999", headers=_auth(token), json={"role": "manager"})
         assert resp.status_code == 404
+
+    def test_update_user_duplicate_employee_link(self):
+        _create_user("admin1", "Admin123!", "admin")
+        emp = _create_employee("Jan", "Kowalski", "jan@example.com")
+        user1 = _create_user("user1", "UserPass1!", "employee", employee_id=emp.id)
+        user2 = _create_user("user2", "UserPass2!", "employee")
+        token = _get_token("admin1", "Admin123!")
+        resp = client.put(
+            f"/api/users/{user2.id}",
+            headers=_auth(token),
+            json={"employee_id": emp.id},
+        )
+        assert resp.status_code == 400
+        assert "already linked" in resp.json()["detail"]
 
 
 class TestDeleteUser:

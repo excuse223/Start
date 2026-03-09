@@ -138,6 +138,13 @@ def create_user(
         if not employee:
             raise HTTPException(status_code=400, detail="Employee not found")
 
+        existing_link = db.query(User).filter(User.employee_id == data.employee_id).first()
+        if existing_link:
+            raise HTTPException(
+                status_code=400,
+                detail="Employee is already linked to another user"
+            )
+
     user = User(
         username=data.username,
         password_hash=pwd_context.hash(data.password),
@@ -173,6 +180,16 @@ def update_user(
             employee = db.query(Employee).filter(Employee.id == data.employee_id).first()
             if not employee:
                 raise HTTPException(status_code=400, detail="Employee not found")
+
+            existing_link = db.query(User).filter(
+                User.employee_id == data.employee_id,
+                User.id != user_id
+            ).first()
+            if existing_link:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Employee is already linked to another user"
+                )
         user.employee_id = data.employee_id
 
     db.commit()
