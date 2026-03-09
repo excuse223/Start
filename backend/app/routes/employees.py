@@ -5,7 +5,8 @@ from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import datetime, date
 from app.database import get_db
-from app.models import Employee, WorkLog
+from app.models import Employee, WorkLog, User
+from app.middleware.auth import get_current_user
 
 router = APIRouter()
 
@@ -37,7 +38,8 @@ class EmployeeResponse(EmployeeBase):
         from_attributes = True
 
 @router.get("", response_model=List[EmployeeResponse])
-def get_employees(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_employees(skip: int = 0, limit: int = 100, db: Session = Depends(get_db),
+                  current_user: User = Depends(get_current_user)):
     """Get all employees"""
     employees = db.query(Employee).offset(skip).limit(limit).all()
     if not employees:
@@ -90,7 +92,8 @@ def get_employees(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     return result
 
 @router.get("/{employee_id}", response_model=EmployeeResponse)
-def get_employee(employee_id: int, db: Session = Depends(get_db)):
+def get_employee(employee_id: int, db: Session = Depends(get_db),
+                 current_user: User = Depends(get_current_user)):
     """Get employee by ID"""
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if not employee:
@@ -98,7 +101,8 @@ def get_employee(employee_id: int, db: Session = Depends(get_db)):
     return employee
 
 @router.post("", response_model=EmployeeResponse, status_code=201)
-def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
+def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db),
+                    current_user: User = Depends(get_current_user)):
     """Create a new employee"""
     db_employee = Employee(**employee.model_dump())
     db.add(db_employee)
@@ -107,7 +111,8 @@ def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
     return db_employee
 
 @router.put("/{employee_id}", response_model=EmployeeResponse)
-def update_employee(employee_id: int, employee: EmployeeUpdate, db: Session = Depends(get_db)):
+def update_employee(employee_id: int, employee: EmployeeUpdate, db: Session = Depends(get_db),
+                    current_user: User = Depends(get_current_user)):
     """Update an employee"""
     db_employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if not db_employee:
@@ -122,7 +127,8 @@ def update_employee(employee_id: int, employee: EmployeeUpdate, db: Session = De
     return db_employee
 
 @router.delete("/{employee_id}", status_code=204)
-def delete_employee(employee_id: int, db: Session = Depends(get_db)):
+def delete_employee(employee_id: int, db: Session = Depends(get_db),
+                    current_user: User = Depends(get_current_user)):
     """Delete an employee"""
     db_employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if not db_employee:

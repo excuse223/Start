@@ -6,7 +6,8 @@ from typing import List, Optional
 from datetime import datetime, date
 from decimal import Decimal
 from app.database import get_db
-from app.models import WorkLog, Employee
+from app.models import WorkLog, Employee, User
+from app.middleware.auth import get_current_user
 
 router = APIRouter()
 
@@ -61,7 +62,8 @@ def get_work_logs(
     end_date: Optional[date] = None,
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """Get work logs with optional filters"""
     query = db.query(WorkLog)
@@ -79,7 +81,8 @@ def get_work_logs(
     return work_logs
 
 @router.get("/summary")
-def get_work_logs_summary(db: Session = Depends(get_db)):
+def get_work_logs_summary(db: Session = Depends(get_db),
+                          current_user: User = Depends(get_current_user)):
     """Get summary of all work logs"""
     work_logs = db.query(WorkLog).all()
     
@@ -121,7 +124,8 @@ def get_work_logs_summary(db: Session = Depends(get_db)):
     }
 
 @router.get("/{work_log_id}", response_model=WorkLogResponse)
-def get_work_log(work_log_id: int, db: Session = Depends(get_db)):
+def get_work_log(work_log_id: int, db: Session = Depends(get_db),
+                 current_user: User = Depends(get_current_user)):
     """Get work log by ID"""
     work_log = db.query(WorkLog).filter(WorkLog.id == work_log_id).first()
     if not work_log:
@@ -129,7 +133,8 @@ def get_work_log(work_log_id: int, db: Session = Depends(get_db)):
     return work_log
 
 @router.post("", response_model=WorkLogResponse, status_code=201)
-def create_work_log(work_log: WorkLogCreate, db: Session = Depends(get_db)):
+def create_work_log(work_log: WorkLogCreate, db: Session = Depends(get_db),
+                    current_user: User = Depends(get_current_user)):
     """Create a new work log"""
     # Check if employee exists
     employee = db.query(Employee).filter(Employee.id == work_log.employee_id).first()
@@ -164,7 +169,8 @@ def create_work_log(work_log: WorkLogCreate, db: Session = Depends(get_db)):
     return response
 
 @router.put("/{work_log_id}", response_model=WorkLogResponse)
-def update_work_log(work_log_id: int, work_log: WorkLogUpdate, db: Session = Depends(get_db)):
+def update_work_log(work_log_id: int, work_log: WorkLogUpdate, db: Session = Depends(get_db),
+                    current_user: User = Depends(get_current_user)):
     """Update a work log"""
     db_work_log = db.query(WorkLog).filter(WorkLog.id == work_log_id).first()
     if not db_work_log:
@@ -208,7 +214,8 @@ def update_work_log(work_log_id: int, work_log: WorkLogUpdate, db: Session = Dep
     return response
 
 @router.delete("/{work_log_id}", status_code=204)
-def delete_work_log(work_log_id: int, db: Session = Depends(get_db)):
+def delete_work_log(work_log_id: int, db: Session = Depends(get_db),
+                    current_user: User = Depends(get_current_user)):
     """Delete a work log"""
     db_work_log = db.query(WorkLog).filter(WorkLog.id == work_log_id).first()
     if not db_work_log:

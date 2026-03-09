@@ -274,6 +274,8 @@ def restore_backup(
     backup = db.query(Backup).filter(Backup.id == backup_id).first()
     if not backup:
         raise HTTPException(status_code=404, detail="Backup not found")
+    if os.path.basename(backup.filename) != backup.filename:
+        raise HTTPException(status_code=400, detail="Invalid backup filename")
     filepath = os.path.join(BACKUP_PATH, backup.filename)
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="Backup file not found on disk")
@@ -293,6 +295,8 @@ def delete_backup(
     backup = db.query(Backup).filter(Backup.id == backup_id).first()
     if not backup:
         raise HTTPException(status_code=404, detail="Backup not found")
+    if os.path.basename(backup.filename) != backup.filename:
+        raise HTTPException(status_code=400, detail="Invalid backup filename")
     filepath = os.path.join(BACKUP_PATH, backup.filename)
     if os.path.exists(filepath):
         os.remove(filepath)
