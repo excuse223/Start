@@ -44,7 +44,16 @@ app = FastAPI(
 
 # --- Middleware (order matters: first added = outermost wrapper) ---
 
-# Security headers (helmet.js equivalent) — must be first so every response gets headers
+# CORS — outermost so its headers are set last and not overwritten by inner middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_allowed_origins(),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Security headers — inner to CORS so it doesn't overwrite CORS preflight headers
 app.add_middleware(SecurityHeadersMiddleware)
 
 # HTTPS enforcement
@@ -56,15 +65,6 @@ app.add_middleware(SecurityLoggingMiddleware)
 
 # GZip compression
 app.add_middleware(GZipMiddleware, minimum_size=1000)
-
-# CORS — use whitelist from environment in production
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=get_allowed_origins(),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Rate limiting
 app.state.limiter = limiter

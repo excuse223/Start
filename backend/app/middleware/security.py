@@ -7,25 +7,51 @@ from starlette.responses import RedirectResponse, Response
 
 security_logger = logging.getLogger("security")
 
-# Security headers equivalent to helmet.js defaults
-_SECURITY_HEADERS = {
+# Security headers equivalent to helmet.js defaults (excludes CSP, which is built dynamically)
+_BASE_SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "X-XSS-Protection": "0",  # Modern browsers: disable legacy XSS filter
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
-    "Content-Security-Policy": (
+    "Cache-Control": "no-store",
+    "Pragma": "no-cache",
+}
+
+
+def _build_csp() -> str:
+    """Build Content-Security-Policy with dynamic connect-src for Codespaces."""
+    connect_sources = ["'self'"]
+
+    codespace_name = os.getenv("CODESPACE_NAME")
+    if codespace_name:
+        domain = os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "app.github.dev")
+        for port in ["3000", "5173", "8000"]:
+            connect_sources.append(f"https://{codespace_name}-{port}.{domain}")
+
+    # Also allow any explicitly configured API URL
+    allowed_origins = os.getenv("ALLOWED_ORIGINS", "")
+    if allowed_origins:
+        for origin in allowed_origins.split(","):
+            origin = origin.strip()
+            if origin and origin not in connect_sources:
+                connect_sources.append(origin)
+
+    connect_src = " ".join(connect_sources)
+
+    return (
         "default-src 'self'; "
         "script-src 'self'; "
         "style-src 'self' 'unsafe-inline'; "
         "img-src 'self' data:; "
         "font-src 'self'; "
-        "connect-src 'self'"
-    ),
-    "Cache-Control": "no-store",
-    "Pragma": "no-cache",
-}
+        f"connect-src {connect_src}"
+    )
+
+
+# Build CSP once at module load time; env vars are static for the process lifetime.
+_CONTENT_SECURITY_POLICY: str = _build_csp()
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -33,8 +59,16 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next) -> Response:
         response = await call_next(request)
-        for header, value in _SECURITY_HEADERS.items():
+
+        # Don't add security headers to CORS preflight responses
+        if request.method == "OPTIONS":
+            return response
+
+        for header, value in _BASE_SECURITY_HEADERS.items():
             response.headers[header] = value
+
+        response.headers["Content-Security-Policy"] = _CONTENT_SECURITY_POLICY
+
         return response
 
 
