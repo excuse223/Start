@@ -150,6 +150,7 @@ def create_user(
         password_hash=pwd_context.hash(data.password),
         role=data.role,
         employee_id=data.employee_id,
+        force_password_change=True,
     )
     db.add(user)
     db.commit()
@@ -239,6 +240,7 @@ def change_user_password(
         raise HTTPException(status_code=404, detail="User not found")
 
     user.password_hash = pwd_context.hash(data.new_password)
+    user.force_password_change = True
     db.commit()
     security_logger.info("Password changed for user %s by %s", user.username, current_user.username)
     return {"message": "Password updated successfully"}

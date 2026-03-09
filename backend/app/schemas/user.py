@@ -47,6 +47,7 @@ class UserResponse(UserBase):
     """Schema for user response (no password)"""
     id: int
     employee_id: Optional[int]
+    force_password_change: bool = False
     created_at: datetime
     updated_at: Optional[datetime] = None
     last_login: Optional[datetime] = None

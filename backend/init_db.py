@@ -23,6 +23,7 @@ def init_database() -> None:
                 password_hash=hashed,
                 role="admin",
                 employee_id=None,
+                force_password_change=True,
             )
             db.add(admin_user)
             db.commit()

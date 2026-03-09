@@ -39,7 +39,7 @@ def cleanup():
     Base.metadata.create_all(bind=engine)
 
 
-def _create_user(username: str, password: str, role: str, employee_id=None) -> User:
+def _create_user(username: str, password: str, role: str, employee_id=None, force_password_change=False) -> User:
     """Helper to insert a user directly into the test DB."""
     db = TestingSessionLocal()
     try:
@@ -48,6 +48,7 @@ def _create_user(username: str, password: str, role: str, employee_id=None) -> U
             password_hash=pwd_context.hash(password),
             role=role,
             employee_id=employee_id,
+            force_password_change=force_password_change,
         )
         db.add(user)
         db.commit()
@@ -204,3 +205,58 @@ def test_change_password_without_token():
         json={"currentPassword": "old", "newPassword": "newpass456"},
     )
     assert response.status_code == 401
+
+
+# --- Force password change tests ---
+
+def test_login_returns_force_password_change_flag():
+    """Test login response includes force_password_change field."""
+    _create_user("forceuser", "secret123", "employee", force_password_change=True)
+
+    response = client.post("/api/auth/login", json={"username": "forceuser", "password": "secret123"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["user"]["force_password_change"] is True
+
+
+def test_login_returns_false_when_no_force():
+    """Test login response returns force_password_change=False when not set."""
+    _create_user("normaluser", "secret123", "employee", force_password_change=False)
+
+    response = client.post("/api/auth/login", json={"username": "normaluser", "password": "secret123"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["user"]["force_password_change"] is False
+
+
+def test_change_password_clears_force_flag():
+    """Test that changing password sets force_password_change to False."""
+    _create_user("forcechg", "oldpass123", "employee", force_password_change=True)
+
+    login_response = client.post("/api/auth/login", json={"username": "forcechg", "password": "oldpass123"})
+    token = login_response.json()["token"]
+
+    # Change password
+    response = client.post(
+        "/api/auth/change-password",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"currentPassword": "oldpass123", "newPassword": "newpass456"},
+    )
+    assert response.status_code == 200
+
+    # Verify force_password_change is now False
+    login2 = client.post("/api/auth/login", json={"username": "forcechg", "password": "newpass456"})
+    assert login2.status_code == 200
+    assert login2.json()["user"]["force_password_change"] is False
+
+
+def test_me_returns_force_password_change():
+    """Test /me endpoint includes force_password_change field."""
+    _create_user("meforce", "pass123", "admin", force_password_change=True)
+
+    login_response = client.post("/api/auth/login", json={"username": "meforce", "password": "pass123"})
+    token = login_response.json()["token"]
+
+    response = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
+    assert response.json()["force_password_change"] is True

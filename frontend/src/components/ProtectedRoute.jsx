@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 
 export default function ProtectedRoute({ children, requiredRole }) {
-  const { user, loading } = useAuth();
+  const { user, loading, forcePasswordChange } = useAuth();
   const { t } = useTranslation();
   const location = useLocation();
 
@@ -25,6 +25,11 @@ export default function ProtectedRoute({ children, requiredRole }) {
   if (!user) {
     // Redirect to login and save the location they were trying to access
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Redirect users who must change their password
+  if (forcePasswordChange) {
+    return <Navigate to="/force-password-change" replace />;
   }
 
   // Check role if required
