@@ -1,5 +1,17 @@
 .users-page {
   padding: 0;
+  animation: usersPageFadeIn 0.4s ease;
+}
+
+@keyframes usersPageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .users-header {
@@ -7,12 +19,17 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1.5rem 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
 }
 
 .users-header h1 {
   margin: 0;
-  font-size: 1.5rem;
-  color: #1a202c;
+  font-size: 1.6rem;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .users-filters {
@@ -28,11 +45,12 @@
   border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .search-input:focus {
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  border-color: #764ba2;
+  box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.12);
 }
 
 .role-filter {
@@ -43,10 +61,46 @@
   background: white;
   cursor: pointer;
   outline: none;
+  transition: border-color 0.2s ease;
 }
 
 .role-filter:focus {
-  border-color: #4299e1;
+  border-color: #764ba2;
+}
+
+/* White card design */
+.users-page .card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  animation: cardSlideIn 0.35s ease;
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Table row animation */
+.users-page tbody tr {
+  transition: background-color 0.15s ease;
+  animation: rowFadeIn 0.25s ease both;
+}
+
+@keyframes rowFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .badge {
@@ -81,4 +135,44 @@
   padding: 4rem;
   text-align: center;
   color: #718096;
+}
+
+/* Responsive mobile layout */
+@media (max-width: 768px) {
+  .users-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .users-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .users-filters {
+    flex-direction: column;
+  }
+
+  .role-filter {
+    width: 100%;
+  }
+
+  .users-page .table-container {
+    font-size: 0.85rem;
+  }
+
+  .users-page th,
+  .users-page td {
+    padding: 0.65rem 0.75rem;
+  }
+
+  /* Hide less critical columns on small screens */
+  .col-hide-mobile {
+    display: none;
+  }
+
+  .btn-group {
+    flex-direction: column;
+  }
 }
