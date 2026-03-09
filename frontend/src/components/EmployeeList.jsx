@@ -12,11 +12,11 @@ function formatLastEntry(lastEntry, t) {
   const yesterdayUTC = yesterday.toISOString().slice(0, 10);
   const entryDateStr = lastEntry.date;
   let label;
-  if (entryDateStr === todayUTC) label = 'Today';
-  else if (entryDateStr === yesterdayUTC) label = 'Yesterday';
+  if (entryDateStr === todayUTC) label = t('common.today');
+  else if (entryDateStr === yesterdayUTC) label = t('common.yesterday');
   else {
     const diffDays = Math.round((new Date(todayUTC) - new Date(entryDateStr)) / (1000 * 60 * 60 * 24));
-    label = `${diffDays}d ago`;
+    label = t('common.daysAgo', { count: diffDays });
   }
   return `${label} (${lastEntry.work_hours}h)`;
 }

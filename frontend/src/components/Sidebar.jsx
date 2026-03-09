@@ -20,7 +20,7 @@ function Sidebar() {
 
   return (
     <div className="sidebar">
-      <h1>Work Hours</h1>
+      <h1>{t('login.workHours')}</h1>
 
       <div className="sidebar-search">
         <GlobalSearch />
@@ -54,12 +54,12 @@ function Sidebar() {
         </NavLink>
         <NavLink to="/calendar" className={({ isActive }) => isActive ? 'active' : ''}>
           <span>📅</span>
-          {t('navigation.calendar', 'Calendar')}
+          {t('navigation.calendar')}
         </NavLink>
         {isAdminOrManager && (
           <NavLink to="/projects" className={({ isActive }) => isActive ? 'active' : ''}>
             <span>📁</span>
-            {t('navigation.projects', 'Projects')}
+            {t('navigation.projects')}
           </NavLink>
         )}
         <NavLink to="/reports" className={({ isActive }) => isActive ? 'active' : ''}>
@@ -81,19 +81,19 @@ function Sidebar() {
         {isAdmin && (
           <NavLink to="/backups" className={({ isActive }) => isActive ? 'active' : ''}>
             <span>💾</span>
-            {t('navigation.backups', 'Backups')}
+            {t('navigation.backups')}
           </NavLink>
         )}
         {isAdmin && (
           <NavLink to="/audit-logs" className={({ isActive }) => isActive ? 'active' : ''}>
             <span>📋</span>
-            {t('navigation.auditLogs', 'Audit Logs')}
+            {t('navigation.auditLogs')}
           </NavLink>
         )}
         {isAdmin && (
           <NavLink to="/settings" className={({ isActive }) => isActive ? 'active' : ''}>
             <span>⚙️</span>
-            {t('navigation.settings', 'Settings')}
+            {t('navigation.settings')}
           </NavLink>
         )}
       </nav>

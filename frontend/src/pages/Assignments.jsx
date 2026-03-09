@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import './Assignments.css';
 
 function Assignments() {
   const { user: currentUser } = useAuth();
+  const { t } = useTranslation();
   const [managers, setManagers] = useState([]);
   const [selectedManager, setSelectedManager] = useState('');
   const [assignments, setAssignments] = useState([]);
@@ -54,7 +56,7 @@ function Assignments() {
       const resp = await axios.get(`${API_URL}/assignments/manager/${managerId}`);
       setAssignments(resp.data);
     } catch (err) {
-      setError('Failed to load assignments.');
+      setError(t('assignments.failedLoad'));
       console.error('Error fetching assignments:', err);
     } finally {
       setLoading(false);
@@ -62,12 +64,12 @@ function Assignments() {
   };
 
   const handleRemove = async (assignmentId) => {
-    if (!window.confirm('Remove this assignment?')) return;
+    if (!window.confirm(t('assignments.removeConfirm'))) return;
     try {
       await axios.delete(`${API_URL}/assignments/${assignmentId}`);
       fetchAssignments(selectedManager);
     } catch (err) {
-      const msg = err.response?.data?.detail || 'Failed to remove assignment.';
+      const msg = err.response?.data?.detail || t('assignments.failedRemove');
       alert(msg);
     }
   };
@@ -106,23 +108,23 @@ function Assignments() {
   if (currentUser?.role !== 'admin') {
     return (
       <div className="access-denied">
-        <h2>Access Denied</h2>
-        <p>You need admin role to view this page.</p>
+        <h2>{t('common.accessDenied')}</h2>
+        <p>{t('common.accessDeniedAdmin')}</p>
       </div>
     );
   }
 
   return (
     <div className="assignments-page">
-      <h1>👔 Manager Assignments</h1>
+      <h1>👔 {t('assignments.title')}</h1>
 
       <div className="manager-selector">
-        <label>Select Manager:</label>
+        <label>{t('assignments.selectManagerLabel')}</label>
         <select
           value={selectedManager}
           onChange={e => setSelectedManager(e.target.value)}
         >
-          <option value="">— Choose a manager —</option>
+          <option value="">{t('assignments.chooseManager')}</option>
           {managers.map(m => (
             <option key={m.id} value={m.id}>
               {m.username}
@@ -135,12 +137,12 @@ function Assignments() {
       {selectedManager && (
         <div className="assignments-section">
           <div className="assignments-header">
-            <h2>Assigned Employees ({assignments.length})</h2>
+            <h2>{t('assignments.assignedEmployees', { count: assignments.length })}</h2>
             <button
               className="btn btn-primary"
               onClick={() => { setSelectedToAssign([]); setModalOpen(true); }}
             >
-              + Assign Employee
+              {t('assignments.assignEmployee')}
             </button>
           </div>
 
@@ -149,7 +151,7 @@ function Assignments() {
           {loading ? (
             <div className="loading"><div className="spinner"></div></div>
           ) : assignments.length === 0 ? (
-            <p className="no-assignments">No employees assigned to this manager yet.</p>
+            <p className="no-assignments">{t('assignments.noAssignments')}</p>
           ) : (
             <div className="employee-cards">
               {assignments.map(a => (
@@ -168,7 +170,7 @@ function Assignments() {
                     className="btn btn-danger btn-sm"
                     onClick={() => handleRemove(a.id)}
                   >
-                    Remove
+                    {t('common.delete')}
                   </button>
                 </div>
               ))}
@@ -181,12 +183,12 @@ function Assignments() {
         <div className="modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header-assign">
-              <h2>Assign Employees</h2>
+              <h2>{t('assignments.assignTitle')}</h2>
               <button className="modal-close" onClick={() => setModalOpen(false)}>✕</button>
             </div>
 
             {availableEmployees.length === 0 ? (
-              <p>All employees are already assigned to this manager.</p>
+              <p>{t('assignments.allAssigned')}</p>
             ) : (
               <div className="assign-list">
                 {availableEmployees.map(emp => (
@@ -207,14 +209,14 @@ function Assignments() {
 
             <div className="modal-actions-assign">
               <button className="btn btn-secondary" onClick={() => setModalOpen(false)}>
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleAssign}
                 disabled={selectedToAssign.length === 0}
               >
-                Assign Selected ({selectedToAssign.length})
+                {t('assignments.assignSelected', { count: selectedToAssign.length })}
               </button>
             </div>
           </div>

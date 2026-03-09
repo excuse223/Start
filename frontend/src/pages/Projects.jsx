@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import ProjectModal from '../components/ProjectModal';
 import './Projects.css';
 
 const STATUS_OPTIONS = ['planning', 'active', 'on_hold', 'completed', 'cancelled'];
 
-const statusLabel = (s) => {
-  const map = { planning: 'Planning', active: 'Active', on_hold: 'On Hold', completed: 'Completed', cancelled: 'Cancelled' };
-  return map[s] || s;
-};
-
 function Projects() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,7 +32,7 @@ function Projects() {
       const resp = await axios.get(`${API_URL}/projects`, { params });
       setProjects(resp.data);
     } catch (err) {
-      setError('Failed to load projects.');
+      setError(t('projects.failedLoad'));
       console.error(err);
     } finally {
       setLoading(false);
@@ -43,13 +40,24 @@ function Projects() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this project?')) return;
+    if (!window.confirm(t('projects.deleteConfirm'))) return;
     try {
       await axios.delete(`${API_URL}/projects/${id}`);
       fetchProjects();
     } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to delete project.');
+      alert(err.response?.data?.detail || t('projects.failedDelete'));
     }
+  };
+
+  const statusLabel = (s) => {
+    const map = {
+      planning: t('projects.statusPlanning'),
+      active: t('projects.statusActive'),
+      on_hold: t('projects.statusOnHold'),
+      completed: t('projects.statusCompleted'),
+      cancelled: t('projects.statusCancelled'),
+    };
+    return map[s] || s;
   };
 
   const filtered = projects.filter(p => {
@@ -62,10 +70,10 @@ function Projects() {
   return (
     <div className="projects-page">
       <div className="projects-header">
-        <h1>📁 Projects</h1>
+        <h1>📁 {t('projects.title')}</h1>
         {(user?.role === 'admin' || user?.role === 'manager') && (
           <button className="btn btn-primary" onClick={() => { setEditingProject(null); setModalOpen(true); }}>
-            + New Project
+            {t('projects.newProject')}
           </button>
         )}
       </div>
@@ -75,16 +83,16 @@ function Projects() {
       <div className="projects-filters">
         <input
           type="text"
-          placeholder="🔍 Search projects..."
+          placeholder={t('projects.searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="search-input"
         />
         <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); }} className="status-filter">
-          <option value="">All Statuses</option>
+          <option value="">{t('projects.allStatuses')}</option>
           {STATUS_OPTIONS.map(s => <option key={s} value={s}>{statusLabel(s)}</option>)}
         </select>
-        <button className="btn btn-secondary" onClick={fetchProjects}>🔄 Refresh</button>
+        <button className="btn btn-secondary" onClick={fetchProjects}>{t('projects.refresh')}</button>
       </div>
 
       {loading ? (
@@ -95,18 +103,18 @@ function Projects() {
             <table>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Client</th>
-                  <th>Budget</th>
-                  <th>Deadline</th>
-                  <th>Status</th>
-                  <th>Team</th>
-                  <th>Actions</th>
+                  <th>{t('projects.columnName')}</th>
+                  <th>{t('projects.columnClient')}</th>
+                  <th>{t('projects.columnBudget')}</th>
+                  <th>{t('projects.columnDeadline')}</th>
+                  <th>{t('projects.columnStatus')}</th>
+                  <th>{t('projects.columnTeam')}</th>
+                  <th>{t('projects.columnActions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>No projects found.</td></tr>
+                  <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>{t('projects.noProjects')}</td></tr>
                 ) : filtered.map(p => (
                   <tr key={p.id}>
                     <td><strong>{p.name}</strong>{p.description && <div className="project-desc">{p.description.slice(0, 60)}{p.description.length > 60 ? '…' : ''}</div>}</td>
@@ -114,14 +122,14 @@ function Projects() {
                     <td>{p.budget != null ? `$${p.budget.toLocaleString()}` : '-'}</td>
                     <td>{p.deadline || '-'}</td>
                     <td><span className={`status-badge status-${p.status}`}>{statusLabel(p.status)}</span></td>
-                    <td>{p.employees?.length || 0} members</td>
+                    <td>{t('projects.members', { count: p.employees?.length || 0 })}</td>
                     <td>
                       <div className="btn-group">
                         {(user?.role === 'admin' || user?.role === 'manager') && (
-                          <button className="btn btn-secondary" onClick={() => { setEditingProject(p); setModalOpen(true); }}>Edit</button>
+                          <button className="btn btn-secondary" onClick={() => { setEditingProject(p); setModalOpen(true); }}>{t('common.edit')}</button>
                         )}
                         {user?.role === 'admin' && (
-                          <button className="btn btn-danger" onClick={() => handleDelete(p.id)}>Delete</button>
+                          <button className="btn btn-danger" onClick={() => handleDelete(p.id)}>{t('common.delete')}</button>
                         )}
                       </div>
                     </td>

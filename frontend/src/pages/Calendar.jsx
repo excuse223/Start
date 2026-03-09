@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import './Calendar.css';
-
-const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 function getDaysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
@@ -17,6 +15,7 @@ function getFirstDayOfMonth(year, month) {
 
 function Calendar() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1); // 1-based
@@ -26,6 +25,18 @@ function Calendar() {
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [error, setError] = useState(null);
+
+  const MONTH_NAMES = [
+    t('calendar.monthJanuary'), t('calendar.monthFebruary'), t('calendar.monthMarch'),
+    t('calendar.monthApril'), t('calendar.monthMay'), t('calendar.monthJune'),
+    t('calendar.monthJuly'), t('calendar.monthAugust'), t('calendar.monthSeptember'),
+    t('calendar.monthOctober'), t('calendar.monthNovember'), t('calendar.monthDecember'),
+  ];
+
+  const DAY_NAMES = [
+    t('calendar.daySun'), t('calendar.dayMon'), t('calendar.dayTue'),
+    t('calendar.dayWed'), t('calendar.dayThu'), t('calendar.dayFri'), t('calendar.daySat'),
+  ];
 
   useEffect(() => {
     if (user?.role === 'admin' || user?.role === 'manager') {
@@ -48,7 +59,7 @@ function Calendar() {
       const resp = await axios.get(`${API_URL}/calendar`, { params });
       setDays(resp.data.days);
     } catch (err) {
-      setError('Failed to load calendar data.');
+      setError(t('calendar.failedLoad'));
       setDays([]);
     } finally {
       setLoading(false);
@@ -96,10 +107,10 @@ function Calendar() {
   return (
     <div className="calendar-page">
       <div className="calendar-header">
-        <h1>📅 Work Calendar</h1>
+        <h1>📅 {t('calendar.title')}</h1>
         {(user?.role === 'admin' || user?.role === 'manager') && employees.length > 0 && (
           <select value={employeeId} onChange={e => setEmployeeId(e.target.value)} className="employee-filter">
-            <option value="">— My Calendar —</option>
+            <option value="">{t('calendar.myCalendar')}</option>
             {employees.map(e => (
               <option key={e.id} value={e.id}>{e.first_name} {e.last_name}</option>
             ))}
@@ -112,7 +123,7 @@ function Calendar() {
         <h2>{MONTH_NAMES[month - 1]} {year}</h2>
         <button className="nav-btn" onClick={nextMonth}>›</button>
         <button className="btn btn-secondary today-btn" onClick={() => { setYear(now.getFullYear()); setMonth(now.getMonth() + 1); }}>
-          Today
+          {t('calendar.today')}
         </button>
       </div>
 
@@ -154,10 +165,10 @@ function Calendar() {
           </div>
 
           <div className="calendar-legend">
-            <span className="legend-item day-full">≥8h work</span>
-            <span className="legend-item day-partial">partial work</span>
-            <span className="legend-item day-vacation">vacation</span>
-            <span className="legend-item day-sick">sick leave</span>
+            <span className="legend-item day-full">{t('calendar.legendFull')}</span>
+            <span className="legend-item day-partial">{t('calendar.legendPartial')}</span>
+            <span className="legend-item day-vacation">{t('calendar.legendVacation')}</span>
+            <span className="legend-item day-sick">{t('calendar.legendSick')}</span>
           </div>
         </>
       )}
@@ -170,10 +181,10 @@ function Calendar() {
               <button onClick={() => setSelectedDay(null)} className="modal-close">✕</button>
             </div>
             <div className="day-modal-body">
-              <div className="day-stat"><span>Work Hours</span><strong>{selectedDay.entry.work_hours}h</strong></div>
-              <div className="day-stat"><span>Overtime</span><strong>{selectedDay.entry.overtime_hours}h</strong></div>
-              <div className="day-stat"><span>Vacation</span><strong>{selectedDay.entry.vacation_hours}h</strong></div>
-              <div className="day-stat"><span>Sick Leave</span><strong>{selectedDay.entry.sick_leave_hours}h</strong></div>
+              <div className="day-stat"><span>{t('calendar.modalWorkHours')}</span><strong>{selectedDay.entry.work_hours}h</strong></div>
+              <div className="day-stat"><span>{t('calendar.modalOvertime')}</span><strong>{selectedDay.entry.overtime_hours}h</strong></div>
+              <div className="day-stat"><span>{t('calendar.modalVacation')}</span><strong>{selectedDay.entry.vacation_hours}h</strong></div>
+              <div className="day-stat"><span>{t('calendar.modalSickLeave')}</span><strong>{selectedDay.entry.sick_leave_hours}h</strong></div>
               {selectedDay.entry.notes && <div className="day-notes"><em>{selectedDay.entry.notes}</em></div>}
             </div>
           </div>

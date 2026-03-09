@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import UserModal from '../components/UserModal';
 import API_URL from '../config';
 import './Users.css';
 
 function Users() {
   const { user: currentUser } = useAuth();
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ function Users() {
       const response = await axios.get(`${API_URL}/users`);
       setUsers(response.data);
     } catch (err) {
-      setError('Failed to load users.');
+      setError(t('users.failedLoad'));
       console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
@@ -46,12 +48,12 @@ function Users() {
   };
 
   const handleDelete = async (userId) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (!window.confirm(t('users.deleteConfirm'))) return;
     try {
       await axios.delete(`${API_URL}/users/${userId}`);
       fetchUsers();
     } catch (err) {
-      const msg = err.response?.data?.detail || 'Failed to delete user.';
+      const msg = err.response?.data?.detail || t('users.failedDelete');
       alert(msg);
     }
   };
@@ -87,8 +89,8 @@ function Users() {
   if (currentUser?.role !== 'admin') {
     return (
       <div className="access-denied">
-        <h2>Access Denied</h2>
-        <p>You need admin role to view this page.</p>
+        <h2>{t('common.accessDenied')}</h2>
+        <p>{t('common.accessDeniedAdmin')}</p>
       </div>
     );
   }
@@ -96,9 +98,9 @@ function Users() {
   return (
     <div className="users-page">
       <div className="users-header">
-        <h1>👤 Users Management</h1>
+        <h1>👤 {t('users.title')}</h1>
         <button className="btn btn-primary" onClick={openCreate}>
-          + Add User
+          {t('users.addUser')}
         </button>
       </div>
 
@@ -107,7 +109,7 @@ function Users() {
       <div className="users-filters">
         <input
           type="text"
-          placeholder="🔍 Search by username..."
+          placeholder={t('users.searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="search-input"
@@ -117,7 +119,7 @@ function Users() {
           onChange={e => setRoleFilter(e.target.value)}
           className="role-filter"
         >
-          <option value="">All Roles</option>
+          <option value="">{t('users.allRoles')}</option>
           <option value="admin">Admin</option>
           <option value="manager">Manager</option>
           <option value="employee">Employee</option>
@@ -132,19 +134,19 @@ function Users() {
             <table>
               <thead>
                 <tr>
-                  <th className="col-hide-mobile">ID</th>
-                  <th>Username</th>
-                  <th>Role</th>
-                  <th>Linked Employee</th>
-                  <th className="col-hide-mobile">Created</th>
-                  <th>Actions</th>
+                  <th className="col-hide-mobile">{t('users.columnId')}</th>
+                  <th>{t('users.columnUsername')}</th>
+                  <th>{t('users.columnRole')}</th>
+                  <th>{t('users.columnEmployee')}</th>
+                  <th className="col-hide-mobile">{t('users.columnCreated')}</th>
+                  <th>{t('users.columnActions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredUsers.length === 0 ? (
                   <tr>
                     <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                      No users found.
+                      {t('users.noUsers')}
                     </td>
                   </tr>
                 ) : (
@@ -169,14 +171,14 @@ function Users() {
                             className="btn btn-secondary"
                             onClick={() => openEdit(u)}
                           >
-                            Edit
+                            {t('common.edit')}
                           </button>
                           <button
                             className="btn btn-danger"
                             onClick={() => handleDelete(u.id)}
                             disabled={u.id === currentUser?.id}
                           >
-                            Delete
+                            {t('common.delete')}
                           </button>
                         </div>
                       </td>

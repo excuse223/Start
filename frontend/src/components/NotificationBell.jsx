@@ -1,22 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import './NotificationBell.css';
 
-function timeAgo(dateStr) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'just now';
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days === 1) return 'yesterday';
-  return `${days}d ago`;
-}
-
 function NotificationBell() {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -48,6 +38,18 @@ function NotificationBell() {
     }
   };
 
+  const timeAgo = (dateStr) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return t('common.justNow');
+    if (minutes < 60) return t('common.minutesAgo', { count: minutes });
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return t('common.hoursAgo', { count: hours });
+    const days = Math.floor(hours / 24);
+    if (days === 1) return t('common.yesterday');
+    return t('common.daysAgo', { count: days });
+  };
+
   const unread = notifications.filter(n => !n.read).length;
 
   const handleRead = async (notif) => {
@@ -73,7 +75,7 @@ function NotificationBell() {
       <button
         className="bell-btn"
         onClick={() => setOpen(o => !o)}
-        aria-label="Notifications"
+        aria-label={t('notifications.title')}
       >
         🔔
         {unread > 0 && <span className="unread-badge">{unread > 9 ? '9+' : unread}</span>}
@@ -82,14 +84,14 @@ function NotificationBell() {
       {open && (
         <div className="notifications-dropdown">
           <div className="notif-header">
-            <span>Notifications</span>
+            <span>{t('notifications.title')}</span>
             {unread > 0 && (
-              <button className="mark-all-btn" onClick={handleMarkAll}>Mark all read</button>
+              <button className="mark-all-btn" onClick={handleMarkAll}>{t('notifications.markAllRead')}</button>
             )}
           </div>
 
           {notifications.length === 0 ? (
-            <div className="notif-empty">No notifications</div>
+            <div className="notif-empty">{t('notifications.noNotifications')}</div>
           ) : (
             <div className="notif-list">
               {notifications.map(n => (

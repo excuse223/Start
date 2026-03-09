@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import API_URL from '../config';
 import './UserModal.css';
 
@@ -32,6 +33,7 @@ function generatePassword() {
 }
 
 function UserModal({ editingUser, employees, onSaved, onClose }) {
+  const { t } = useTranslation();
   const isEdit = !!editingUser;
   const [username, setUsername] = useState(editingUser?.username || '');
   const [password, setPassword] = useState('');
@@ -53,7 +55,7 @@ function UserModal({ editingUser, employees, onSaved, onClose }) {
     setError('');
 
     if (!isEdit && !password) {
-      setError('Password is required.');
+      setError(t('userModal.passwordRequired'));
       return;
     }
 
@@ -85,7 +87,7 @@ function UserModal({ editingUser, employees, onSaved, onClose }) {
       if (Array.isArray(detail)) {
         setError(detail.map(d => d.msg).join(', '));
       } else {
-        setError(detail || 'Failed to save user.');
+        setError(detail || t('userModal.failedSave'));
       }
     } finally {
       setSaving(false);
@@ -96,7 +98,7 @@ function UserModal({ editingUser, employees, onSaved, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>{isEdit ? 'Edit User' : 'Create New User'}</h2>
+          <h2>{isEdit ? t('userModal.editUser') : t('userModal.createUser')}</h2>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
 
@@ -104,39 +106,39 @@ function UserModal({ editingUser, employees, onSaved, onClose }) {
           {error && <div className="alert alert-error">{error}</div>}
 
           <div className="form-group">
-            <label>Username *</label>
+            <label>{t('userModal.usernameLabel')}</label>
             <input
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
               disabled={isEdit}
               required={!isEdit}
-              placeholder="e.g. jan.kowalski"
+              placeholder={t('userModal.usernamePlaceholder')}
             />
           </div>
 
           <div className="form-group">
-            <label>{isEdit ? 'New Password (leave blank to keep)' : 'Password *'}</label>
+            <label>{isEdit ? t('userModal.newPasswordLabel') : t('userModal.passwordLabel')}</label>
             <div className="password-field">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required={!isEdit}
-                placeholder={isEdit ? 'Leave blank to keep current' : 'Min 8 chars, upper+lower+number'}
+                placeholder={isEdit ? t('userModal.keepPasswordPlaceholder') : t('userModal.passwordPlaceholder')}
                 autoComplete="new-password"
               />
               <button type="button" className="btn-icon" onClick={() => setShowPassword(v => !v)}>
                 {showPassword ? '🙈' : '👁️'}
               </button>
               <button type="button" className="btn btn-secondary btn-sm" onClick={handleGenerate}>
-                Generate
+                {t('userModal.generate')}
               </button>
             </div>
           </div>
 
           <div className="form-group">
-            <label>Role *</label>
+            <label>{t('userModal.roleLabel')}</label>
             <select value={role} onChange={e => setRole(e.target.value)} required>
               {ROLES.map(r => (
                 <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
@@ -145,9 +147,9 @@ function UserModal({ editingUser, employees, onSaved, onClose }) {
           </div>
 
           <div className="form-group">
-            <label>Link to Employee</label>
+            <label>{t('userModal.linkEmployee')}</label>
             <select value={employeeId} onChange={e => setEmployeeId(e.target.value)}>
-              <option value="">— No link —</option>
+              <option value="">{t('userModal.noLink')}</option>
               {employees.map(emp => (
                 <option key={emp.id} value={emp.id}>
                   {emp.first_name} {emp.last_name} (#{emp.id})
@@ -158,10 +160,10 @@ function UserModal({ editingUser, employees, onSaved, onClose }) {
 
           <div className="modal-actions">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create User'}
+              {saving ? t('userModal.saving') : isEdit ? t('userModal.saveChanges') : t('userModal.createUserBtn')}
             </button>
           </div>
         </form>
