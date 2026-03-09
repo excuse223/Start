@@ -12,6 +12,13 @@ from app.routes import employees, work_logs, reports
 from app.routes import auth
 from app.routes import users as users_router_module
 from app.routes import assignments as assignments_router_module
+from app.routes import projects as projects_router_module
+from app.routes import backups as backups_router_module
+from app.routes import calendar as calendar_router_module
+from app.routes import notifications as notifications_router_module
+from app.routes import search as search_router_module
+from app.routes import audit as audit_router_module
+from app.routes import settings as settings_router_module
 from app.database import engine, Base
 from app.middleware.security import (
     SecurityHeadersMiddleware,
@@ -71,6 +78,13 @@ app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(users_router_module.router, prefix="/api/users", tags=["users"])
 app.include_router(assignments_router_module.router, prefix="/api/assignments", tags=["assignments"])
+app.include_router(projects_router_module.router, prefix="/api/projects", tags=["projects"])
+app.include_router(backups_router_module.router, prefix="/api/backups", tags=["backups"])
+app.include_router(calendar_router_module.router, prefix="/api/calendar", tags=["calendar"])
+app.include_router(notifications_router_module.router, prefix="/api/notifications", tags=["notifications"])
+app.include_router(search_router_module.router, prefix="/api/search", tags=["search"])
+app.include_router(audit_router_module.router, prefix="/api/audit", tags=["audit"])
+app.include_router(settings_router_module.router, prefix="/api/settings", tags=["settings"])
 
 @app.get("/")
 async def root():

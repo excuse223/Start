@@ -1,0 +1,55 @@
+/* Light theme (default) */
+:root,
+[data-theme="light"] {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-sidebar: #2c3e50;
+  --text-primary: #2c3e50;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+  --card-bg: #ffffff;
+  --border: #e0e0e0;
+  --border-light: #f0f0f0;
+  --input-bg: #ffffff;
+  --table-header-bg: #f8f9fa;
+  --table-hover-bg: #fafafa;
+  --shadow: rgba(0, 0, 0, 0.08);
+  --shadow-lg: rgba(0, 0, 0, 0.15);
+  --btn-primary-bg: #4a90e2;
+  --btn-primary-color: #ffffff;
+  --btn-secondary-bg: #e2e8f0;
+  --btn-secondary-color: #4a5568;
+  --sidebar-text: #ecf0f1;
+  --sidebar-hover: rgba(255, 255, 255, 0.1);
+  --sidebar-active: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #242424;
+  --bg-sidebar: #111111;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #777777;
+  --card-bg: #2d2d2d;
+  --border: #404040;
+  --border-light: #333333;
+  --input-bg: #333333;
+  --table-header-bg: #333333;
+  --table-hover-bg: #353535;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-lg: rgba(0, 0, 0, 0.5);
+  --btn-primary-bg: #5a9fd4;
+  --btn-primary-color: #ffffff;
+  --btn-secondary-bg: #404040;
+  --btn-secondary-color: #c0c0c0;
+  --sidebar-text: #c0c0c0;
+  --sidebar-hover: rgba(255, 255, 255, 0.07);
+  --sidebar-active: rgba(255, 255, 255, 0.15);
+}
+
+/* Theme transition */
+*, *::before, *::after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
