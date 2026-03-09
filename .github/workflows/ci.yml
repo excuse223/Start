@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend (Python 3.11)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: work_hours_db
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U admin -d work_hours_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://admin:test_password@localhost:5432/work_hours_db
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      JWT_SECRET: test-secret-key-for-ci-only-do-not-use-in-production
+      ENVIRONMENT: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        working-directory: backend
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint with flake8
+        working-directory: backend
+        run: |
+          pip install flake8
+          # Run flake8 but don't fail the build — lint issues are reported as warnings
+          flake8 app/ --max-line-length=120 --ignore=E501,W503 || true
+
+      - name: Run tests
+        working-directory: backend
+        run: python -m pytest tests/ -q
+
+  frontend:
+    name: Frontend (Node 18)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Run tests
+        working-directory: frontend
+        run: npm test -- --watchAll=false
+        # Tests may not exist yet; allow failure so the build is not blocked
+        continue-on-error: true

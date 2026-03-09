@@ -1,51 +1,59 @@
 # Work Hours Management System - Docker Compose Configuration
 # 
 # IMPORTANT SECURITY NOTES FOR PRODUCTION:
-# 1. Change all default passwords (POSTGRES_PASSWORD)
+# 1. Copy .env.example to .env and set strong passwords before running
 # 2. Use Docker secrets or environment files for sensitive data
 # 3. Restrict CORS origins in backend/app/main.py
 # 4. Use HTTPS with proper SSL certificates
 # 5. Set strong SECRET_KEY in backend .env file
 # 6. Consider using a reverse proxy (nginx/traefik) for SSL termination
 #
-# For local development, the default credentials are acceptable.
+# For local development, copy .env.example to .env and adjust as needed.
 
 services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_DB: work_hours_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # Ports are intentionally not exposed to the host for security.
+    # To connect directly from your local machine during development,
+    # uncomment the line below:
+    # ports:
+    #   - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d work_hours_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    # Ports are intentionally not exposed to the host for security.
+    # To connect directly from your local machine during development,
+    # uncomment the line below:
+    # ports:
+    #   - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   backend:
     build: ./backend
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://admin:secure_password@postgres:5432/work_hours_db
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      LOCAL_BACKUP_PATH: /var/backups/worklog
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      LOCAL_BACKUP_PATH: ${LOCAL_BACKUP_PATH}
     depends_on:
       postgres:
         condition: service_healthy
@@ -54,6 +62,13 @@ services:
     volumes:
       - ./backend:/app
       - backup_data:/var/backups/worklog
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
@@ -61,6 +76,12 @@ services:
       - "3000:80"
     depends_on:
       - backend
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
 volumes:
   postgres_data:
