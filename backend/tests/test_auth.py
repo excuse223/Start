@@ -118,9 +118,9 @@ def test_get_me_without_token():
 
 
 def test_get_me_with_invalid_token():
-    """Test /me with invalid token returns 403."""
+    """Test /me with invalid token returns 401."""
     response = client.get("/api/auth/me", headers={"Authorization": "Bearer invalid.token.here"})
-    assert response.status_code == 403
+    assert response.status_code == 401
     assert response.json()["detail"] == "Invalid or expired token"
 
 
