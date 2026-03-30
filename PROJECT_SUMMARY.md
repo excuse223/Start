@@ -1,29 +1,37 @@
 # Work Hours Management System - Project Summary
 
 ## Overview
-Complete full-stack web application for managing and tracking employee work hours with reporting capabilities.
+Complete full-stack web application for managing and tracking employee work hours with reporting capabilities, role-based access control, and comprehensive administration tools.
 
 ## Technology Stack
 
 ### Backend
-- **Framework**: FastAPI 0.104.1
+- **Framework**: FastAPI 0.115.6
 - **Database**: PostgreSQL 15
-- **ORM**: SQLAlchemy 2.0.23
-- **Migrations**: Alembic 1.12.1
-- **PDF Generation**: ReportLab 4.0.7
-- **Testing**: Pytest 7.4.3
+- **ORM**: SQLAlchemy 2.0.36
+- **Migrations**: Alembic 1.14.0
+- **Authentication**: PyJWT (JWT tokens)
+- **PDF Generation**: ReportLab 4.2.5
+- **Rate Limiting**: slowapi
+- **Scheduling**: APScheduler 3.11.0
+- **Remote Storage**: boto3 (S3), Paramiko (SFTP)
+- **Testing**: Pytest (83 test cases)
 
 ### Frontend
 - **Framework**: React 18.2.0
 - **Routing**: React Router DOM 6.20.0
 - **HTTP Client**: Axios 1.6.2
 - **Charts**: Chart.js 4.4.0 with react-chartjs-2 5.2.0
+- **Internationalization**: i18next 23.7.6 (Polish + English)
+- **PDF Export**: jspdf 4.1.0, html2canvas
 - **Build Tool**: React Scripts 5.0.1
 
 ### Infrastructure
-- **Containerization**: Docker with Docker Compose
-- **Web Server**: Nginx (for frontend)
+- **Containerization**: Docker with Docker Compose (4 services)
+- **Web Server**: Nginx (frontend + reverse proxy)
 - **Database**: PostgreSQL 15
+- **Caching**: Redis 7
+- **CI/CD**: GitHub Actions
 
 ## Project Structure
 
@@ -31,224 +39,217 @@ Complete full-stack web application for managing and tracking employee work hour
 Start/
 ├── backend/
 │   ├── app/
-│   │   ├── models/          # Database models
-│   │   │   ├── employee.py  # Employee model
-│   │   │   ├── work_log.py  # Work log model
-│   │   │   ├── user.py      # User model
-│   │   │   └── role.py      # Role model
-│   │   ├── routes/          # API endpoints
-│   │   │   ├── employees.py # Employee CRUD
-│   │   │   ├── work_logs.py # Work log CRUD
-│   │   │   └── reports.py   # Report generation
-│   │   ├── services/        # Business logic
-│   │   │   └── pdf_generator.py  # PDF report generation
+│   │   ├── models/          # 12 database models
+│   │   ├── routes/          # 14 API route modules
+│   │   ├── schemas/         # Pydantic validation schemas
+│   │   ├── services/        # Business logic (PDF generation)
+│   │   ├── middleware/       # Auth, security headers
 │   │   ├── database.py      # Database configuration
+│   │   ├── limiter.py       # Rate limiting setup
 │   │   └── main.py          # FastAPI application
-│   ├── alembic/             # Database migrations
-│   ├── tests/               # Backend tests
+│   ├── alembic/             # 7 database migrations
+│   ├── config/              # Security configuration
+│   ├── scripts/             # Backup & setup scripts
+│   ├── tests/               # 6 test files (83 tests)
+│   ├── utils/               # Logging utilities
 │   ├── Dockerfile
-│   ├── requirements.txt
-│   └── .env.example
+│   └── requirements.txt
 ├── frontend/
-│   ├── public/
-│   │   └── index.html
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── Dashboard.jsx       # Main dashboard
-│   │   │   ├── Sidebar.jsx         # Navigation
-│   │   │   ├── EmployeeList.jsx    # Employee listing
-│   │   │   ├── EmployeeDetails.jsx # Employee details
-│   │   │   ├── WorkLogForm.jsx     # Work log form
-│   │   │   ├── Charts.jsx          # Chart components
-│   │   │   └── Reports.jsx         # Report generation
-│   │   ├── App.jsx          # Main app component
-│   │   ├── App.css          # Main styles
-│   │   ├── index.js         # Entry point
-│   │   └── index.css        # Global styles
+│   │   ├── components/      # 15 React components
+│   │   ├── pages/           # 9 page components
+│   │   ├── contexts/        # Auth & Theme contexts
+│   │   ├── locales/         # i18n translations (PL/EN)
+│   │   ├── styles/          # CSS themes
+│   │   ├── __tests__/       # Frontend tests
+│   │   ├── App.jsx          # Main routing
+│   │   └── i18n.js          # i18next config
 │   ├── Dockerfile
 │   ├── nginx.conf
-│   ├── package.json
-│   └── .env.example
+│   └── package.json
+├── .github/workflows/       # CI pipeline
 ├── docker-compose.yml       # Container orchestration
-├── .gitignore
-└── README.md                # Documentation
-
-Total files: 44
+└── Documentation (9 files)  # README, guides, API docs, changelog
 ```
 
-## Key Features
+## Implemented Features (18/18 ✅)
 
-### 1. Employee Management
-- Create, read, update, and delete employees
-- Track employee details (name, email)
-- View work history per employee
+### 1. Employee Management ✅
+- Full CRUD operations
+- Track hourly rates and overtime rates per employee
+- First/last name, email, and manager assignment
 
-### 2. Work Log Tracking
-- Record daily work hours across multiple categories:
-  - Regular work hours
-  - Overtime hours
-  - Vacation hours
-  - Sick leave hours
-  - Other hours
+### 2. Work Log Tracking ✅
+- Record daily work hours across 6 categories:
+  - Regular work hours, Overtime, Vacation, Sick leave, Other, Absent
 - Date-based unique constraint (one log per employee per day)
-- Automatic validation and warnings for excessive hours (>12h)
-- Optional notes for each work log
+- Automatic warnings for excessive hours (>12h)
+- Optional notes for each entry
 
-### 3. Reports
-Two types of reports with different access levels:
+### 3. Reports ✅
+- **Manager Reports**: Hours breakdown (no financial data)
+- **Owner Reports**: Full financial breakdown with cost calculations
+- Export in JSON and PDF formats
+- Configurable hourly rates and overtime multipliers
 
-**Manager Reports** (Hours Only):
-- Work hours breakdown by category
-- Totals for the period
-- No financial information
+### 4. Authentication & Authorization ✅
+- JWT token-based authentication
+- Three roles: admin, manager, employee
+- Force password change on first login
+- Secure password hashing (bcrypt)
 
-**Owner Reports** (Full Financial Data):
-- Work hours breakdown
-- Hourly rates and overtime multipliers
-- Cost breakdown by category
-- Total costs for the period
+### 5. User Management ✅ (Admin only)
+- Create, update, delete users with role assignment
+- Link users to employee records
+- Admin password reset with force-change flag
 
-Both reports available in JSON and PDF formats.
+### 6. Project Management ✅
+- Full CRUD with budget, deadline, client, and status tracking
+- Many-to-many employee assignment
+- Project progress tracking
 
-### 4. Dashboard & Visualization
+### 7. Manager-Employee Assignments ✅
+- Assign managers to employees
+- Track which manager oversees which employees
+
+### 8. Backup System ✅
+- Local backups with automatic retention policy
+- Remote backups: SFTP and S3/MinIO support
+- Encryption and compression options
+- Automated daily backups (APScheduler)
+- Backup integrity validation (checksums)
+- Restore functionality
+
+### 9. Audit Logging ✅
+- Tracks all user and system actions
+- Records old/new values, IP address, user agent
+- Searchable and filterable
+
+### 10. Notifications ✅
+- In-app notification system
+- Mark as read/unread, delete
+- Notification types for system events
+
+### 11. Calendar View ✅
+- Month-based work entry visualization
+- Color-coded days by work type
+- Employee-switching for managers/admins
+
+### 12. Global Search ✅
+- Search across employees, work logs, and projects
+- Full-text search capability
+
+### 13. Settings/Configuration ✅
+- Application-wide key-value configuration store
+- Track who updated settings and when
+
+### 14. Dashboard & Visualization ✅
 - Summary statistics cards
-- Pie chart: Work hours distribution by category
-- Bar chart: Monthly work hours overview
-- Color-coded categories:
-  - Green: Work hours
-  - Blue: Overtime
-  - Yellow: Vacation
-  - Red: Sick leave
+- Pie charts (work hours by category)
+- Bar charts (monthly hours)
+- Color-coded categories
 
-### 5. Data Validation
-- Hours cannot be negative
-- Warning when total hours exceed 12 per day (but allows save)
-- Unique constraint: One work log per employee per date
-- Email validation for employees
-- Required fields validation
+### 15. Internationalization (i18n) ✅
+- Polish and English language support
+- Easy language switching with saved preference
+- Default: Polish
 
-## API Endpoints
+### 16. Dark Mode ✅
+- Theme toggle (dark/light)
+- Context-based theme management
 
-### Employees
-- `GET /api/employees` - List all employees
-- `GET /api/employees/{id}` - Get employee by ID
-- `POST /api/employees` - Create new employee
-- `PUT /api/employees/{id}` - Update employee
-- `DELETE /api/employees/{id}` - Delete employee
+### 17. Security Features ✅
+- CORS middleware, security headers (X-Frame-Options, CSP, HSTS, etc.)
+- HTTPS enforcement (optional)
+- Rate limiting (slowapi)
+- SQL injection protection (SQLAlchemy ORM)
+- Input validation (Pydantic)
+- Secure password hashing
 
-### Work Logs
-- `GET /api/work-logs` - List work logs (with filters)
-- `GET /api/work-logs/{id}` - Get work log by ID
-- `POST /api/work-logs` - Create new work log
-- `PUT /api/work-logs/{id}` - Update work log
-- `DELETE /api/work-logs/{id}` - Delete work log
+### 18. Responsive Design ✅
+- Desktop, tablet, and mobile support
+- Sidebar navigation with mobile-friendly layout
 
-Query parameters for filtering:
-- `employee_id`: Filter by employee
-- `start_date`: Filter by start date
-- `end_date`: Filter by end date
+## API Endpoints (60+)
 
-### Reports
-- `GET /api/reports/manager/{employee_id}` - Manager report
-- `GET /api/reports/owner/{employee_id}` - Owner report
+| Resource | Endpoints | Description |
+|----------|-----------|-------------|
+| Employees | 5 | Full CRUD |
+| Work Logs | 6 | CRUD + summary + filtering |
+| Reports | 2 | Manager & owner reports |
+| Auth | 4 | Login, logout, me, change-password |
+| Users | 6 | Admin user management |
+| Projects | 8 | CRUD + employee assignment |
+| Assignments | 4 | Manager-employee links |
+| Backups | 8 | Create, restore, configure, test |
+| Calendar | 1 | Monthly calendar view |
+| Notifications | 4 | List, read, delete |
+| Audit | 1 | Audit log listing |
+| Settings | 2 | Get and update settings |
+| Search | 1 | Global search |
 
-Parameters:
-- `start_date` (required)
-- `end_date` (required)
-- `format`: "json" or "pdf" (default: "json")
-- `hourly_rate` (owner only, default: 25.0)
-- `overtime_multiplier` (owner only, default: 1.5)
+## Database Schema (12 tables)
 
-## Database Schema
-
-### employees
-- `id`: Primary key (Integer)
-- `first_name`: VARCHAR (NOT NULL)
-- `last_name`: VARCHAR (NOT NULL)
-- `email`: VARCHAR (nullable)
-- `created_at`: TIMESTAMP
-- `updated_at`: TIMESTAMP
-
-### work_logs
-- `id`: Primary key (Integer)
-- `employee_id`: Foreign key -> employees.id (NOT NULL)
-- `work_date`: DATE (NOT NULL)
-- `work_hours`: DECIMAL(5,2)
-- `overtime_hours`: DECIMAL(5,2)
-- `vacation_hours`: DECIMAL(5,2)
-- `sick_leave_hours`: DECIMAL(5,2)
-- `other_hours`: DECIMAL(5,2)
-- `notes`: TEXT
-- `created_at`: TIMESTAMP
-- `updated_at`: TIMESTAMP
-- UNIQUE(employee_id, work_date)
-
-### users (for future authentication)
-- `id`: Primary key (Integer)
-- `username`: VARCHAR (UNIQUE, NOT NULL)
-- `password`: VARCHAR (NOT NULL, hashed)
-- `email`: VARCHAR (UNIQUE, NOT NULL)
-- `role_id`: Foreign key -> roles.id
-- `created_at`: TIMESTAMP
-
-### roles (for future authorization)
-- `id`: Primary key (Integer)
-- `name`: VARCHAR (UNIQUE, NOT NULL)
-- `description`: VARCHAR
+| Table | Purpose |
+|-------|---------|
+| employees | Employee records with rates |
+| work_logs | Daily work entries (6 hour categories) |
+| users | User accounts with roles and auth |
+| roles | Role definitions |
+| projects | Project management |
+| project_employees | Project-employee assignments (M:N) |
+| manager_employee_assignments | Manager-employee links |
+| backups | Backup records with checksums |
+| backup_logs | Backup operation logs |
+| audit_logs | Full audit trail |
+| notifications | In-app notifications |
+| settings | Application configuration |
 
 ## Testing
 
-### Backend Tests
-Located in `backend/tests/test_api.py`:
-- Root and health endpoint tests
-- Employee CRUD operations
-- Work log CRUD operations
-- Validation tests (hours > 12h warning)
-- Duplicate date constraint tests
-- Filtering tests
+### Backend Tests (83 test cases ✅)
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| test_api.py | 15 | Employees, work logs, validation |
+| test_auth.py | 14 | Login, tokens, password change |
+| test_backups.py | 6 | Backup CRUD and configuration |
+| test_projects.py | 5 | Project CRUD |
+| test_trailing_slash.py | 8 | URL consistency |
+| test_users_assignments.py | 31 | Users, roles, assignments |
 
-Run tests:
+### Frontend Tests
+- App rendering, Login component, ProtectedRoute
+
+### Running Tests
 ```bash
-cd backend
-pytest
+cd backend && python -m pytest tests/ -q
+cd frontend && npm test
 ```
 
-### Test Coverage
-- 15 comprehensive test cases
-- All major API endpoints covered
-- Edge cases and validation rules tested
-
-## Security Features
+## Security
 
 ### Implemented
-- Input validation with Pydantic
+- JWT authentication with proper 401/403 status codes
+- Role-based access control (admin, manager, employee)
+- Security headers middleware (CSP, HSTS, X-Frame-Options, etc.)
+- Rate limiting (slowapi)
+- Password hashing (bcrypt via passlib)
+- Input validation (Pydantic models)
 - SQL injection protection (SQLAlchemy ORM)
 - CORS configuration
-- Unique constraints in database
-- Non-negative hours validation
-- Email format validation
+- HTTPS enforcement (optional)
 
-### Production Recommendations
-1. Change default database password
-2. Restrict CORS origins to specific domains
-3. Implement JWT authentication
-4. Use HTTPS/SSL certificates
-5. Set strong SECRET_KEY
-6. Use environment variables for secrets
-7. Regular security updates
-8. Database backups
-9. Rate limiting
-10. Input sanitization for notes field
+### Security Scan Results
+- CodeQL scan: 0 alerts (Python and JavaScript)
+- No known security vulnerabilities
 
 ## Deployment
 
 ### Local Development
 ```bash
-# Clone repository
 git clone https://github.com/excuse223/Start.git
 cd Start
-
-# Start all services
+cp .env.example .env  # Configure environment variables
 docker-compose up -d --build
 
 # Access:
@@ -259,116 +260,40 @@ docker-compose up -d --build
 
 ### Database Migrations
 ```bash
-# Apply migrations
 docker-compose exec backend alembic upgrade head
-
-# Create new migration
 docker-compose exec backend alembic revision --autogenerate -m "description"
 ```
 
-### Backup & Restore
-```bash
-# Backup
-docker-compose exec postgres pg_dump -U admin work_hours_db > backup.sql
-
-# Restore
-docker-compose exec -T postgres psql -U admin work_hours_db < backup.sql
-```
-
-## Performance Considerations
-
-### Database
-- Indexed columns: id, employee_id, work_date, username, email
-- Unique constraints for data integrity
-- Foreign key relationships with cascading deletes
-
-### Frontend
-- React production build optimized
-- Nginx serving static files
-- Lazy loading for components (can be added)
-- Chart.js for efficient rendering
-
-### Backend
-- Async FastAPI for high concurrency
-- Database connection pooling
-- Pagination support for large datasets
+## Documentation
+- `README.md` — Main documentation
+- `PROJECT_SUMMARY.md` — This file
+- `QUICK_START.md` — Setup instructions
+- `USER_GUIDE.md` — User manual
+- `ADMIN_GUIDE.md` — Admin manual
+- `API_DOCUMENTATION.md` — API reference
+- `CHANGELOG.md` — Version history
+- `POLISH_I18N_SUMMARY.md` — i18n details
+- `.github/BRANCH_PROTECTION.md` — Branch rules
 
 ## Future Enhancements
-
-### Authentication & Authorization
-- JWT token-based authentication
-- Role-based access control (manager vs owner)
-- User registration and login
-
-### Additional Features
-- Email notifications
-- Export to Excel/CSV
-- Advanced filtering and search
-- Dashboard customization
-- Multi-language support
+- Email notifications (infrastructure ready: aiosmtplib, APScheduler)
+- Excel/CSV export (openpyxl dependency present)
+- Redis caching (Redis service deployed, not yet utilized)
+- Celery for background tasks
+- Advanced dashboard customization
 - Time tracking timer
 - Mobile app
-- API rate limiting
-- Audit logs
 - Batch operations
 
-### Scalability
-- Redis caching
-- Celery for background tasks
-- Load balancing
-- Database replication
-- CDN for static assets
-
 ## Code Quality
-
-### Code Review Results
-- 9 review comments addressed
-- Security warnings added
-- Redundant code removed
-- Documentation improved
-
-### Security Scan Results
-- CodeQL scan: 0 alerts (Python and JavaScript)
-- No security vulnerabilities found
-- All dependencies up to date
-
-### Best Practices
 - Type hints in Python code
-- Pydantic models for validation
+- Pydantic models for request/response validation
 - SQLAlchemy ORM for database access
-- React hooks for state management
+- React hooks and Context API for state management
 - Component-based architecture
-- Separation of concerns
 - RESTful API design
 - Comprehensive error handling
-
-## Maintenance
-
-### Monitoring
-- Check application logs: `docker-compose logs`
-- Monitor database performance
-- Track API response times
-- Monitor disk usage for database
-
-### Updates
-- Regular dependency updates
-- Security patches
-- Database backups
-- Performance optimization
-
-## Support
-
-### Documentation
-- Comprehensive README.md
-- API documentation at /docs (FastAPI)
-- Inline code comments
-- This project summary
-
-### Troubleshooting
-- Check container status: `docker-compose ps`
-- View logs: `docker-compose logs [service]`
-- Restart services: `docker-compose restart`
-- Rebuild: `docker-compose up -d --build`
+- GitHub Actions CI pipeline
 
 ## License
 MIT License
@@ -376,17 +301,10 @@ MIT License
 ## Author
 excuse223
 
-## Acknowledgments
-- FastAPI documentation
-- React.js community
-- Chart.js team
-- ReportLab developers
-- PostgreSQL community
-
 ---
 
 **Project Status**: ✅ Complete and Production-Ready
 
-**Last Updated**: February 2024
+**Last Updated**: March 2026
 
-**Version**: 1.0.0
+**Version**: 1.1.0-dev
